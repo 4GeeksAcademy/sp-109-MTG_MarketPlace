@@ -1,12 +1,14 @@
 """
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
+
+
 import os
 from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
-from api.models import db
+from api.models import db, Producto, CategoriaProductoSingle, CategoriaSingle
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
@@ -64,6 +66,39 @@ def serve_any_other_file(path):
     response = send_from_directory(static_file_dir, path)
     response.cache_control.max_age = 0  # avoid cache memory
     return response
+
+@app.route('/producto', methods=['GET'])
+def get_producto():
+    all_producto = Producto.query.all()
+    results =list(map(lambda producto:producto.serialize(),all_producto ))
+  
+    return jsonify(results), 200
+
+@app.route('/categoria_producto', methods=['POST'])
+def add_categoria_producto():
+    print(request)
+    print(request.get_json())
+
+    body=request.get_json()
+
+    if 'producto_id' not in body:
+        return'Debes enviar el producto_id'
+    
+    if 'categoria_id' not in body:
+        return'Debes enviar el categoria_id'
+    
+     
+    categoria_producto = CategoriaProductoSingle(**body)
+    db.session.add(categoria_producto)
+    db.session.commit()
+
+    response_body = {
+        "msg": "Se agrego producto",
+        "categoria_producto":categoria_producto.serialize()
+         
+    }
+  
+    return jsonify(response_body), 200
 
 
 # this only runs if `$ python src/main.py` is executed
