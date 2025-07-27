@@ -24,21 +24,14 @@ class User(db.Model):
         }
 
 #PRODUCTO
-class Producto(db.Model):
+class Deck(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
-    nombre: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
-    precio: Mapped[str] = mapped_column(nullable=False)
-    stock: Mapped[str] = mapped_column(nullable=False)
+    nombre: Mapped[str] = mapped_column(String(120), nullable=False)
+    precio: Mapped[int] = mapped_column(nullable=False)
+    stock: Mapped[int] = mapped_column(nullable=False)
     vendedor_id: Mapped[str] = mapped_column(nullable=False)
 
     
-
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
-    user: Mapped["User"] = relationship(back_populates="productos")
-
-    
-
-
     def serialize(self):
         return {
             "id": self.id,
@@ -48,44 +41,42 @@ class Producto(db.Model):
             # do not serialize the password, its a security breach
         }
     
- 
-
-#CATEGORIA
-class CategoriaSingle(db.Model):
+class Single(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
-    categoria: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
+    nombre: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
+    precio: Mapped[int] = mapped_column(nullable=False)
+    rareza: Mapped[str] = mapped_column(nullable=False)
+    stock: Mapped[int] = mapped_column(nullable=False)
+    vendedor_id: Mapped[str] = mapped_column(nullable=False)
 
-    categoria_producto_single: Mapped[List["CategoriaProductoSingle"]] = relationship(back_populates="categoria_single")
- 
-
-
+    
     def serialize(self):
         return {
             "id": self.id,
-            "categoria": self.categoria,
+            "nombre": self.nombre,
+            "precio": self.precio,
+            "rareza": self.rareza,
+            "stock": self.stock,
             # do not serialize the password, its a security breach
         }
     
-
-#CATEGORIA  PRODUCTO  
-class CategoriaProductoSingle(db.Model):
+class BoosterPack(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
-    producto_id: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
-    categoria_id: Mapped[str] = mapped_column(nullable=False)
-    rareza: Mapped[str] = mapped_column(nullable=False)
+    nombre: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
+    precio: Mapped[int] = mapped_column(nullable=False)
+    stock: Mapped[int] = mapped_column(nullable=False)
+    vendedor_id: Mapped[str] = mapped_column(nullable=False)
 
-
-    categoria_single_id: Mapped[int] = mapped_column(ForeignKey("categoria_single.id"))
-    categoria_single: Mapped["CategoriaSingle"] = relationship(back_populates="categoria_producto_single")
-
+    
     def serialize(self):
         return {
             "id": self.id,
-            "producto_id": self.producto_id,
-            "categoria_id": self.categoria_id,
-            "rareza": self.rareza,
+            "nombre": self.nombre,
+            "precio": self.precio,
+            "stock": self.stock,
             # do not serialize the password, its a security breach
         }
-
-
+    
+    
+ 
 
