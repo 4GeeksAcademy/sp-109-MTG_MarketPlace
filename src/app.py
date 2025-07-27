@@ -59,45 +59,143 @@ def sitemap():
     return send_from_directory(static_file_dir, 'index.html')
 
 # any other endpoint will try to serve it like a static file
-@app.route('/<path:path>', methods=['GET'])
-def serve_any_other_file(path):
-    if not os.path.isfile(os.path.join(static_file_dir, path)):
-        path = 'index.html'
-    response = send_from_directory(static_file_dir, path)
-    response.cache_control.max_age = 0  # avoid cache memory
-    return response
 
-@app.route('/producto', methods=['GET'])
-def get_producto():
-    all_producto = Producto.query.all()
-    results =list(map(lambda producto:producto.serialize(),all_producto ))
+#DECK
+@app.route('/deck', methods=['GET'])
+def get_decks():
+    all_decks = Deck.query.all()
+    results =list(map(lambda deck:deck.serialize(),all_decks ))
   
     return jsonify(results), 200
 
-@app.route('/categoria_producto', methods=['POST'])
-def add_categoria_producto():
-    print(request)
-    print(request.get_json())
+@app.route('/deck/<int:deck_id>', methods=['GET'])
+def get_deck_dos(deck_id):
+    deck= db.session.get(Deck, deck_id)
 
-    body=request.get_json()
+    return jsonify(deck.serialize()), 200
 
-    if 'producto_id' not in body:
-        return'Debes enviar el producto_id'
-    
-    if 'categoria_id' not in body:
-        return'Debes enviar el categoria_id'
-    
-     
-    categoria_producto = CategoriaProductoSingle(**body)
-    db.session.add(categoria_producto)
-    db.session.commit()
+@app.route('/deck/<int:deck_id>', methods=['DELETE'])
+def delete_deck(deck_id):
+    deck= db.session.get(Deck, deck_id)
 
     response_body = {
-        "msg": "Se agrego producto",
-        "categoria_producto":categoria_producto.serialize()
-         
+        "msg": 'Se elimino Deck' +  deck.nombre
     }
+    db.session.delete(deck)
+    db.session.commit() 
+
+    return jsonify(response_body), 200
+
+
+@app.route('/deck', methods=['POST'])
+def add_deck():
+
+    print(request)
+    print(request.get_json())
+    print(request.get_json()['nombre'])
+    
+    body=request.get_json()
+    carta = Deck(**body)
+    db.session.add(carta) 
+    db.session.commit()
+     
+    response_body = {
+        "msg": "Se creo el Deck",
+        "carta":carta.serialize()
+          }
+
+    return jsonify(response_body), 200
+
+#SINGLE
+@app.route('/single', methods=['GET'])
+def get_single():
+    all_single = Single.query.all()
+    results =list(map(lambda single:single.serialize(),all_single ))
   
+    return jsonify(results), 200
+
+@app.route('/single/<int:single_id>', methods=['GET'])
+def get_single_dos(single_id):
+    single= db.session.get(Single, single_id)
+
+    return jsonify(single.serialize()), 200
+
+@app.route('/single/<int:single_id>', methods=['DELETE'])
+def delete_single(single_id):
+    single= db.session.get(Single, single_id)
+
+    response_body = {
+        "msg": 'Se elimino Single' +  single.nombre
+    }
+    db.session.delete(single)
+    db.session.commit() 
+
+    return jsonify(response_body), 200
+
+@app.route('/single', methods=['POST'])
+def add_single():
+
+    print(request)
+    print(request.get_json())
+    print(request.get_json()['nombre'])
+    
+    body=request.get_json()
+    carta = Single(**body)
+    db.session.add(carta) 
+    db.session.commit()
+     
+    response_body = {
+        "msg": "Se creo el Single",
+        "carta":carta.serialize()
+          }
+
+    return jsonify(response_body), 200
+
+
+#BOOSTERPACK
+@app.route('/boosterpack', methods=['GET'])
+def get_boosterpack():
+    all_boosterpack = BoosterPack.query.all()
+    results =list(map(lambda boosterpack:boosterpack.serialize(),all_boosterpack ))
+  
+    return jsonify(results), 200
+
+
+@app.route('/boosterpack/<int:boosterpack_id>', methods=['GET'])
+def get_boosterpack_dos(boosterpack_id):
+    boosterpack= db.session.get(BoosterPack, boosterpack_id)
+
+    return jsonify(boosterpack.serialize()), 200
+
+@app.route('/boosterpack/<int:boosterpack_id>', methods=['DELETE'])
+def delete_boosterpack(boosterpack_id):
+    boosterpack= db.session.get(BoosterPack, boosterpack_id)
+
+    response_body = {
+        "msg": 'Se elimino Booster Pack' +  boosterpack.nombre
+    }
+    db.session.delete(boosterpack)
+    db.session.commit() 
+
+    return jsonify(response_body), 200
+
+@app.route('/boosterpack', methods=['POST'])
+def add_boosterpack():
+
+    print(request)
+    print(request.get_json())
+    print(request.get_json()['nombre'])
+    
+    body=request.get_json()
+    carta = BoosterPack(**body)
+    db.session.add(carta) 
+    db.session.commit()
+     
+    response_body = {
+        "msg": "Se creo el BoosterPack",
+        "carta":carta.serialize()
+          }
+
     return jsonify(response_body), 200
 
 
