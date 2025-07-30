@@ -13,8 +13,7 @@ class User(db.Model):
     password: Mapped[str] = mapped_column(nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False)
 
-    productos: Mapped[List["Producto"]] = relationship(back_populates="user")
-
+    
 
     def serialize(self):
         return {
@@ -74,6 +73,23 @@ class BoosterPack(db.Model):
             "nombre": self.nombre,
             "precio": self.precio,
             "stock": self.stock,
+            # do not serialize the password, its a security breach
+        }
+    
+class Categorias(db.Model):
+    id: Mapped[int] = mapped_column(primary_key=True)
+    nombre: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
+    precio: Mapped[int] = mapped_column(nullable=False)
+    rareza: Mapped[str] = mapped_column(nullable=False)
+    stock: Mapped[int] = mapped_column(nullable=False)
+    vendedor_id: Mapped[str] = mapped_column(nullable=False)
+
+    
+    def serialize(self):
+        return {
+            "id": self.id,
+            "nombre": self.nombre,
+            "precio": self.precio,
             # do not serialize the password, its a security breach
         }
     
