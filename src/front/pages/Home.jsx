@@ -5,27 +5,6 @@ import Form from "../components/Form.jsx";
 import Data from "../components/Data.jsx";
 
 export const Home = () => {
-
-	const handleProductAdded = () => {
-		setReload(!reload);
-	};
-
-
-	return (
-		<>
-			<div className="text-center mt-5">
-				<h1 className="display-4">MTG Marketplace</h1>
-				
-				<Data />
-
-
-			</div>
-
-		</>
-	);
-}; 
-=======
-export const Home = () => {
     const { store, dispatch } = useGlobalReducer()
     const loadMessage = async () => {
         try {
@@ -50,7 +29,9 @@ export const Home = () => {
             <h1 className="display-4">Hello Rigo!!</h1>
             <p className="lead">
                 <img src={rigoImageUrl} className="img-fluid rounded-circle mb-3" alt="Rigo Baby" />
-            </p>
+              
+            </p>  
+            <Data />
             <div className="alert alert-info">
                 {store.message ? (
                     <span>{store.message}</span>

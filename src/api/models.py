@@ -111,11 +111,6 @@ class Categorias(db.Model):
         }
 
     
-    
- 
-=======
-
-# COMPRADOR
 # COMPRADOR
 class Comprador(db.Model):
     __tablename__ = "comprador"

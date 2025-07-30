@@ -1,9 +1,5 @@
 from flask import Flask, request, jsonify, url_for, Blueprint
-
-from api.models import db, User, Deck, Single, BoosterPack
-=======
-from api.models import db, User, Vendedor, Comprador
-
+from api.models import db, User, Deck, Single, BoosterPack, Vendedor, Comprador, Categorias
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 
@@ -49,11 +45,6 @@ def delete_deck(deck_id):
 
 @api.route('/deck', methods=['POST'])
 def add_deck():
-
-    print(request)
-    print(request.get_json())
-    print(request.get_json()['nombre'])
-    
     body=request.get_json()
     carta = Deck(**body)
     db.session.add(carta) 
@@ -95,10 +86,6 @@ def delete_single(single_id):
 @api.route('/single', methods=['POST'])
 def add_single():
 
-    print(request)
-    print(request.get_json())
-    print(request.get_json()['nombre'])
-    
     body=request.get_json()
     carta = Single(**body)
     db.session.add(carta) 
@@ -142,10 +129,7 @@ def delete_boosterpack(boosterpack_id):
 @api.route('/boosterpacks', methods=['POST'])
 def add_boosterpacks():
 
-    print(request)
-    print(request.get_json())
-    print(request.get_json()['nombre'])
-    
+
     body=request.get_json()
     carta = BoosterPack(**body)
     db.session.add(carta) 
@@ -181,8 +165,6 @@ def get_all_categorias():
 
     return jsonify(response), 200
 
-
-=======
 # === API VENDEDORES ===
 
 @api.route('/vendedores', methods=['GET'])
