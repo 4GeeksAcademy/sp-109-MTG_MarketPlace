@@ -16,7 +16,7 @@ app = Flask(__name__)
 app.url_map.strict_slashes = False
 
 # ✅ CORS aplicado globalmente para permitir requests entre frontend (3000) y backend (3001)
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+CORS(app, resources={r"/api/*": {"origins": "https://obscure-rotary-phone-4j6j5xx96499f5qxj-3000.app.github.dev"}})
 
 # DB setup
 db_url = os.getenv("DATABASE_URL")

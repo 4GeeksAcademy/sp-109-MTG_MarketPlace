@@ -21,7 +21,7 @@ export const router = createBrowserRouter(
       <Route path="/single/:theId" element={<Single />} />
       <Route path="/demo" element={<Demo />} />
       <Route path="/vendedores" element={<VendedoresLista />} />
-      <Route path="/vendedores/nuevo" element={<VendedorForm />} />
+      <Route path="/vendedores/crear" element={<VendedorForm />} />
       <Route path="/vendedores/editar/:id" element={<VendedorForm />} />
 
       <Route path="/compradores" element={<CompradorLista />} />
