@@ -10,7 +10,7 @@ import { Single } from "./pages/Single";
 import { Demo } from "./pages/Demo";
 import { VendedoresLista } from "./pages/VendedorLista";
 import { VendedorForm } from "./pages/VendedorForm";
-
+import { VendedorDetalle } from "./pages/VendedorDetalle"; 
 import { CompradorLista } from "./pages/CompradorLista";
 import { CompradorForm } from "./pages/CompradorForm";
 
@@ -23,7 +23,7 @@ export const router = createBrowserRouter(
       <Route path="/vendedores" element={<VendedoresLista />} />
       <Route path="/vendedores/crear" element={<VendedorForm />} />
       <Route path="/vendedores/editar/:id" element={<VendedorForm />} />
-
+      <Route path="/vendedores/:id/detalles" element={<VendedorDetalle />} />
       <Route path="/compradores" element={<CompradorLista />} />
       <Route path="/compradores/nuevo" element={<CompradorForm />} />
       <Route path="/compradores/editar/:id" element={<CompradorForm />} />
