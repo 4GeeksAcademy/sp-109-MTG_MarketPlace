@@ -104,5 +104,18 @@ class CategoriaProductoSingle(db.Model):
             # do not serialize the password, its a security breach
         }
 
+# COMPRADOR
+# COMPRADOR
+class Comprador(db.Model):
+    __tablename__ = "comprador"
 
+    id: Mapped[int] = mapped_column(primary_key=True)
+    username: Mapped[str] = mapped_column(String(120), nullable=False)
+    correo: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
 
+    def serialize(self):
+        return {
+            "id": self.id,
+            "username": self.username,
+            "correo": self.correo
+        }

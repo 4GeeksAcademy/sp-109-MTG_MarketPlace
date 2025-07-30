@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Vendedor
+from api.models import db, User, Vendedor, Comprador
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 
@@ -90,3 +90,71 @@ def delete_vendedor(id):
     db.session.delete(vendedor)
     db.session.commit()
     return jsonify({"msg": "Vendedor eliminado"}), 200
+
+
+# === API COMPRADORES ===
+@api.route('/compradores', methods=['GET'])
+def get_all_compradores():
+    compradores = Comprador.query.all()
+    return jsonify([c.serialize() for c in compradores]), 200
+
+@api.route('/compradores/<int:id>', methods=['GET'])
+def get_comprador(id):
+    comprador = Comprador.query.get(id)
+    if not comprador:
+        return jsonify({"msg": "Comprador no encontrado"}), 404
+    return jsonify(comprador.serialize()), 200
+
+@api.route('/compradores', methods=['POST'])
+def create_comprador():
+    body = request.get_json()
+    required_fields = ["username", "correo"]
+    if not all(field in body for field in required_fields):
+        return jsonify({"msg": "Faltan datos"}), 400
+
+    if Comprador.query.filter_by(username=body["username"]).first():
+        return jsonify({"msg": "Nombre de usuario ya en uso"}), 400
+    if Comprador.query.filter_by(correo=body["correo"]).first():
+        return jsonify({"msg": "Correo ya registrado"}), 400
+
+    comprador = Comprador(
+        username=body["username"],
+        correo=body["correo"]
+    )
+    db.session.add(comprador)
+    db.session.commit()
+    return jsonify(comprador.serialize()), 201
+
+@api.route('/compradores/<int:id>', methods=['PUT'])
+def update_comprador(id):
+    comprador = Comprador.query.get(id)
+    if not comprador:
+        return jsonify({"msg": "Comprador no encontrado"}), 404
+
+    body = request.get_json()
+
+    if "username" in body:
+        existing_user = Comprador.query.filter_by(username=body["username"]).first()
+        if existing_user and existing_user.id != id:
+            return jsonify({"msg": "Nombre de usuario ya en uso"}), 400
+
+    if "correo" in body:
+        existing_email = Comprador.query.filter_by(correo=body["correo"]).first()
+        if existing_email and existing_email.id != id:
+            return jsonify({"msg": "Correo ya registrado"}), 400
+
+    comprador.username = body.get("username", comprador.username)
+    comprador.correo = body.get("correo", comprador.correo)
+
+    db.session.commit()
+    return jsonify(comprador.serialize()), 200
+
+@api.route('/compradores/<int:id>', methods=['DELETE'])
+def delete_comprador(id):
+    comprador = Comprador.query.get(id)
+    if not comprador:
+        return jsonify({"msg": "Comprador no encontrado"}), 404
+
+    db.session.delete(comprador)
+    db.session.commit()
+    return jsonify({"msg": "Comprador eliminado"}), 200
