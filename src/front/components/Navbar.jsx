@@ -1,19 +1,24 @@
 import { Link } from "react-router-dom";
 
 export const Navbar = () => {
-
-	return (
-		<nav className="navbar navbar-light bg-light">
-			<div className="container">
-				<Link to="/">
-					<span className="navbar-brand mb-0 h1">React Boilerplate</span>
-				</Link>
-				<div className="ml-auto">
-					<Link to="/demo">
-						<button className="btn btn-primary">Check the Context in action</button>
-					</Link>
-				</div>
-			</div>
-		</nav>
-	);
+    return (
+        <nav className="navbar navbar-light bg-light">
+            <div className="container">
+                <Link to="/">
+                    <span className="navbar-brand mb-0 h1">MTG Marketplace</span>
+                </Link>
+                <div className="ml-auto d-flex gap-2">
+                    <Link to="/demo">
+                        <button className="btn btn-primary">Check the Context in action</button>
+                    </Link>
+                    <Link to="/vendedores">
+                        <button className="btn btn-secondary">Vendedores</button>
+                    </Link>
+                    <Link to="/compradores">
+                        <button className="btn btn-secondary">Compradores</button>
+                    </Link>
+                </div>
+            </div>
+        </nav>
+    );
 };
