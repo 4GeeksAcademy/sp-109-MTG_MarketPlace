@@ -4,8 +4,7 @@ from flask_migrate import Migrate
 from flask_swagger import swagger
 from flask_cors import CORS
 from api.utils import APIException, generate_sitemap
-from api.models import db, Deck, Single, BoosterPack
-from api.models import db, User, Deck, Single, BoosterPack, Categorias, Comprador
+from api.models import db, User, Producto, Comprador
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
@@ -57,24 +56,6 @@ def serve_any_other_file(path):
     response.cache_control.max_age = 0
     return response
 
-@app.route('/producto', methods=['GET'])
-def get_producto():
-    all_producto = Producto.query.all()
-    return jsonify([p.serialize() for p in all_producto]), 200
-
-@app.route('/categoria_producto', methods=['POST'])
-def add_categoria_producto():
-    body = request.get_json()
-    if 'producto_id' not in body or 'categoria_id' not in body:
-        return 'Faltan datos obligatorios', 400
-
-    categoria_producto = CategoriaProductoSingle(**body)
-    db.session.add(categoria_producto)
-    db.session.commit()
-    return jsonify({
-        "msg": "Se agregó producto",
-        "categoria_producto": categoria_producto.serialize()
-    }), 200
 
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3001))

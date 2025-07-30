@@ -1,5 +1,4 @@
 from typing import List
-
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import String, Boolean, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column,relationship, backref
@@ -39,78 +38,7 @@ class Vendedor(db.Model):
             "correo": self.correo,
         }
 
-#PRODUCTO
-class Deck(db.Model):
-    id: Mapped[int] = mapped_column(primary_key=True)
-    nombre: Mapped[str] = mapped_column(String(120), nullable=False)
-    precio: Mapped[int] = mapped_column(nullable=False)
-    stock: Mapped[int] = mapped_column(nullable=False)
-    vendedor_id: Mapped[str] = mapped_column(nullable=False)
-
-    
-    def serialize(self):
-        return {
-            "id": self.id,
-            "nombre": self.nombre,
-            "precio": self.precio,
-            "stock": self.stock,
-            # do not serialize the password, its a security breach
-        }
-    
-class Single(db.Model):
-    id: Mapped[int] = mapped_column(primary_key=True)
-    nombre: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
-    precio: Mapped[int] = mapped_column(nullable=False)
-    rareza: Mapped[str] = mapped_column(nullable=False)
-    stock: Mapped[int] = mapped_column(nullable=False)
-    vendedor_id: Mapped[str] = mapped_column(nullable=False)
-
-    
-    def serialize(self):
-        return {
-            "id": self.id,
-            "nombre": self.nombre,
-            "precio": self.precio,
-            "rareza": self.rareza,
-            "stock": self.stock,
-            # do not serialize the password, its a security breach
-        }
-    
-class BoosterPack(db.Model):
-    id: Mapped[int] = mapped_column(primary_key=True)
-    nombre: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
-    precio: Mapped[int] = mapped_column(nullable=False)
-    stock: Mapped[int] = mapped_column(nullable=False)
-    vendedor_id: Mapped[str] = mapped_column(nullable=False)
-
-    
-    def serialize(self):
-        return {
-            "id": self.id,
-            "nombre": self.nombre,
-            "precio": self.precio,
-            "stock": self.stock,
-            # do not serialize the password, its a security breach
-        }
-    
-class Categorias(db.Model):
-    id: Mapped[int] = mapped_column(primary_key=True)
-    nombre: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
-    precio: Mapped[int] = mapped_column(nullable=False)
-    rareza: Mapped[str] = mapped_column(nullable=False)
-    stock: Mapped[int] = mapped_column(nullable=False)
-    vendedor_id: Mapped[str] = mapped_column(nullable=False)
-
-    
-    def serialize(self):
-        return {
-            "id": self.id,
-            "nombre": self.nombre,
-            "precio": self.precio,
-            # do not serialize the password, its a security breach
-        }
-
-    
+  
 # COMPRADOR
 class Comprador(db.Model):
     __tablename__ = "comprador"
@@ -125,4 +53,24 @@ class Comprador(db.Model):
             "id": self.id,
             "username": self.username,
             "correo": self.correo
+        }
+
+#PRODUCTO
+
+class Producto(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(120), nullable=False)
+    descripcion = db.Column(db.String(500))
+    precio = db.Column(db.Float, nullable=False)
+    vendedor_id = db.Column(db.Integer, db.ForeignKey('vendedor.id'), nullable=False)
+    
+    vendedor = db.relationship("Vendedor", backref="productos")  # 👈 importante
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "nombre": self.nombre,
+            "descripcion": self.descripcion,
+            "precio": self.precio,
+            "vendedor_id": self.vendedor_id
         }

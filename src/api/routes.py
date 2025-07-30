@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Deck, Single, BoosterPack, Vendedor, Comprador, Categorias
+from api.models import db, User, Vendedor, Producto, Comprador
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 
@@ -16,154 +16,75 @@ def handle_hello():
     return jsonify(response_body), 200
 
 
-#DECK
-@api.route('/deck', methods=['GET'])
-def get_decks():
-    all_decks = Deck.query.all()
-    results =list(map(lambda deck:deck.serialize(),all_decks ))
-  
-    return jsonify(results), 200
+# === API PRODUCTOS ===
 
-@api.route('/deck/<int:deck_id>', methods=['GET'])
-def get_deck_dos(deck_id):
-    deck= db.session.get(Deck, deck_id)
+@api.route('/productos', methods=['GET'])
+def get_productos():
+    productos = Producto.query.all()
+    return jsonify([p.serialize() for p in productos]), 200
 
-    return jsonify(deck.serialize()), 200
+@api.route('/productos/<int:id>', methods=['GET'])
+def get_producto(id):
+    producto = Producto.query.get(id)
+    if not producto:
+        return jsonify({"msg": "Producto no encontrado"}), 404
+    return jsonify(producto.serialize()), 200
 
-@api.route('/deck/<int:deck_id>', methods=['DELETE'])
-def delete_deck(deck_id):
-    deck= db.session.get(Deck, deck_id)
+@api.route('/productos', methods=['POST'])
+def create_producto():
+    data = request.get_json()
+    required_fields = ["nombre", "descripcion", "precio", "vendedor_id"]
+    if not all(field in data for field in required_fields):
+        return jsonify({"msg": "Faltan datos"}), 400
 
-    response_body = {
-        "msg": 'Se elimino Deck' +  deck.nombre
-    }
-    db.session.delete(deck)
-    db.session.commit() 
+    # Verificar si el vendedor existe
+    vendedor = Vendedor.query.get(data["vendedor_id"])
+    if not vendedor:
+        return jsonify({"msg": "El vendedor no existe"}), 400
 
-    return jsonify(response_body), 200
-
-
-@api.route('/deck', methods=['POST'])
-def add_deck():
-    body=request.get_json()
-    carta = Deck(**body)
-    db.session.add(carta) 
+    producto = Producto(
+        nombre=data["nombre"],
+        descripcion=data["descripcion"],
+        precio=data["precio"],
+        vendedor_id=data["vendedor_id"]
+    )
+    db.session.add(producto)
     db.session.commit()
-     
-    response_body = {
-        "msg": "Se creo el Deck",
-        "carta":carta.serialize()
-          }
+    return jsonify(producto.serialize()), 201
 
-    return jsonify(response_body), 200
+@api.route('/productos/<int:id>', methods=['PUT'])
+def update_producto(id):
+    producto = Producto.query.get(id)
+    if not producto:
+        return jsonify({"msg": "Producto no encontrado"}), 404
 
-#SINGLE
-@api.route('/single', methods=['GET'])
-def get_single():
-    all_single = Single.query.all()
-    results =list(map(lambda single:single.serialize(),all_single ))
-  
-    return jsonify(results), 200
+    data = request.get_json()
+    producto.nombre = data.get("nombre", producto.nombre)
+    producto.descripcion = data.get("descripcion", producto.descripcion)
+    producto.precio = data.get("precio", producto.precio)
 
-@api.route('/single/<int:single_id>', methods=['GET'])
-def get_single_dos(single_id):
-    single= db.session.get(Single, single_id)
+    # Solo actualizar vendedor si viene en el body y es válido
+    new_vendedor_id = data.get("vendedor_id")
+    if new_vendedor_id:
+        vendedor = Vendedor.query.get(new_vendedor_id)
+        if not vendedor:
+            return jsonify({"msg": "Nuevo vendedor no existe"}), 400
+        producto.vendedor_id = new_vendedor_id
 
-    return jsonify(single.serialize()), 200
-
-@api.route('/single/<int:single_id>', methods=['DELETE'])
-def delete_single(single_id):
-    single= db.session.get(Single, single_id)
-
-    response_body = {
-        "msg": 'Se elimino Single' +  single.nombre
-    }
-    db.session.delete(single)
-    db.session.commit() 
-
-    return jsonify(response_body), 200
-
-@api.route('/single', methods=['POST'])
-def add_single():
-
-    body=request.get_json()
-    carta = Single(**body)
-    db.session.add(carta) 
     db.session.commit()
-     
-    response_body = {
-        "msg": "Se creo el Single",
-        "carta":carta.serialize()
-          }
+    return jsonify(producto.serialize()), 200
 
-    return jsonify(response_body), 200
+@api.route('/productos/<int:id>', methods=['DELETE'])
+def delete_producto(id):
+    producto = Producto.query.get(id)
+    if not producto:
+        return jsonify({"msg": "Producto no encontrado"}), 404
 
-
-#BOOSTERPACK
-@api.route('/boosterpacks', methods=['GET'])
-def get_boosterpacks():
-    all_boosterpacks = BoosterPack.query.all()
-    results =list(map(lambda boosterpack:boosterpack.serialize(),all_boosterpacks ))
-  
-    return jsonify(results), 200
-
-
-@api.route('/boosterpacks/<int:boosterpack_id>', methods=['GET'])
-def get_boosterpack_dos(boosterpack_id):
-    boosterpack= db.session.get(BoosterPack, boosterpack_id)
-
-    return jsonify(boosterpack.serialize()), 200
-
-@api.route('/boosterpacks/<int:boosterpack_id>', methods=['DELETE'])
-def delete_boosterpack(boosterpack_id):
-    boosterpack= db.session.get(BoosterPack, boosterpack_id)
-
-    response_body = {
-        "msg": 'Se elimino Booster Pack' +  boosterpack.nombre
-    }
-    db.session.delete(boosterpack)
-    db.session.commit() 
-
-    return jsonify(response_body), 200
-
-@api.route('/boosterpacks', methods=['POST'])
-def add_boosterpacks():
-
-
-    body=request.get_json()
-    carta = BoosterPack(**body)
-    db.session.add(carta) 
+    db.session.delete(producto)
     db.session.commit()
-     
-    response_body = {
-        "msg": "Se creo el BoosterPack",
-        "carta":carta.serialize()
-          }
+    return jsonify({"msg": "Producto eliminado"}), 200
 
-    return jsonify(response_body), 200
 
-# #CATEGORIAS
-
-@api.route('/categorias', methods=['GET'])
-def get_all_categorias():
-    
-    all_decks = Deck.query.all()
-    all_singles = Single.query.all()
-    all_boosterpack = BoosterPack.query.all()
-
-    
-    decks_serialized = [deck.serialize() for deck in all_decks]
-    singles_serialized = [single.serialize() for single in all_singles]
-    boosterpack_serialized = [boosterpack.serialize() for boosterpack in all_boosterpack]
-
-    
-    response = {
-        "decks": decks_serialized,
-        "singles": singles_serialized,
-        "boosterPacks": boosterpack_serialized
-    }
-
-    return jsonify(response), 200
 
 # === API VENDEDORES ===
 

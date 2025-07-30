@@ -13,6 +13,11 @@ import { VendedorForm } from "./pages/VendedorForm";
 import { VendedorDetalle } from "./pages/VendedorDetalle"; 
 import { CompradorLista } from "./pages/CompradorLista";
 import { CompradorForm } from "./pages/CompradorForm";
+import { ProductoLista } from "./pages/ProductoLista";
+import { ProductoForm } from "./pages/ProductoForm";
+import { ProductoDetalle } from "./pages/ProductoDetalle";
+
+
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -20,6 +25,10 @@ export const router = createBrowserRouter(
       <Route path="/" element={<Home />} />
       <Route path="/single/:theId" element={<Single />} />
       <Route path="/demo" element={<Demo />} />
+      <Route path="/productos" element={<ProductoLista />} />
+      <Route path="/productos/nuevo" element={<ProductoForm />} />
+      <Route path="/productos/editar/:id" element={<ProductoForm />} />
+      <Route path="/productos/detalles/:id" element={<ProductoDetalle />} />
       <Route path="/vendedores" element={<VendedoresLista />} />
       <Route path="/vendedores/crear" element={<VendedorForm />} />
       <Route path="/vendedores/editar/:id" element={<VendedorForm />} />
