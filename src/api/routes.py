@@ -1,10 +1,12 @@
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Deck, Single, BoosterPack, Vendedor, Comprador, Categorias
+from api.models import db, User,  Vendedor, Comprador, Categorias
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 
+
+
 api = Blueprint('api', __name__)
-#CORS(api)
+CORS(api)
 
 # === ENDPOINTS ===
 
@@ -14,156 +16,6 @@ def handle_hello():
         "message": "En funcionamiento"
     }
     return jsonify(response_body), 200
-
-
-#DECK
-@api.route('/deck', methods=['GET'])
-def get_decks():
-    all_decks = Deck.query.all()
-    results =list(map(lambda deck:deck.serialize(),all_decks ))
-  
-    return jsonify(results), 200
-
-@api.route('/deck/<int:deck_id>', methods=['GET'])
-def get_deck_dos(deck_id):
-    deck= db.session.get(Deck, deck_id)
-
-    return jsonify(deck.serialize()), 200
-
-@api.route('/deck/<int:deck_id>', methods=['DELETE'])
-def delete_deck(deck_id):
-    deck= db.session.get(Deck, deck_id)
-
-    response_body = {
-        "msg": 'Se elimino Deck' +  deck.nombre
-    }
-    db.session.delete(deck)
-    db.session.commit() 
-
-    return jsonify(response_body), 200
-
-
-@api.route('/deck', methods=['POST'])
-def add_deck():
-    body=request.get_json()
-    carta = Deck(**body)
-    db.session.add(carta) 
-    db.session.commit()
-     
-    response_body = {
-        "msg": "Se creo el Deck",
-        "carta":carta.serialize()
-          }
-
-    return jsonify(response_body), 200
-
-#SINGLE
-@api.route('/single', methods=['GET'])
-def get_single():
-    all_single = Single.query.all()
-    results =list(map(lambda single:single.serialize(),all_single ))
-  
-    return jsonify(results), 200
-
-@api.route('/single/<int:single_id>', methods=['GET'])
-def get_single_dos(single_id):
-    single= db.session.get(Single, single_id)
-
-    return jsonify(single.serialize()), 200
-
-@api.route('/single/<int:single_id>', methods=['DELETE'])
-def delete_single(single_id):
-    single= db.session.get(Single, single_id)
-
-    response_body = {
-        "msg": 'Se elimino Single' +  single.nombre
-    }
-    db.session.delete(single)
-    db.session.commit() 
-
-    return jsonify(response_body), 200
-
-@api.route('/single', methods=['POST'])
-def add_single():
-
-    body=request.get_json()
-    carta = Single(**body)
-    db.session.add(carta) 
-    db.session.commit()
-     
-    response_body = {
-        "msg": "Se creo el Single",
-        "carta":carta.serialize()
-          }
-
-    return jsonify(response_body), 200
-
-
-#BOOSTERPACK
-@api.route('/boosterpacks', methods=['GET'])
-def get_boosterpacks():
-    all_boosterpacks = BoosterPack.query.all()
-    results =list(map(lambda boosterpack:boosterpack.serialize(),all_boosterpacks ))
-  
-    return jsonify(results), 200
-
-
-@api.route('/boosterpacks/<int:boosterpack_id>', methods=['GET'])
-def get_boosterpack_dos(boosterpack_id):
-    boosterpack= db.session.get(BoosterPack, boosterpack_id)
-
-    return jsonify(boosterpack.serialize()), 200
-
-@api.route('/boosterpacks/<int:boosterpack_id>', methods=['DELETE'])
-def delete_boosterpack(boosterpack_id):
-    boosterpack= db.session.get(BoosterPack, boosterpack_id)
-
-    response_body = {
-        "msg": 'Se elimino Booster Pack' +  boosterpack.nombre
-    }
-    db.session.delete(boosterpack)
-    db.session.commit() 
-
-    return jsonify(response_body), 200
-
-@api.route('/boosterpacks', methods=['POST'])
-def add_boosterpacks():
-
-
-    body=request.get_json()
-    carta = BoosterPack(**body)
-    db.session.add(carta) 
-    db.session.commit()
-     
-    response_body = {
-        "msg": "Se creo el BoosterPack",
-        "carta":carta.serialize()
-          }
-
-    return jsonify(response_body), 200
-
-# #CATEGORIAS
-
-@api.route('/categorias', methods=['GET'])
-def get_all_categorias():
-    
-    all_decks = Deck.query.all()
-    all_singles = Single.query.all()
-    all_boosterpack = BoosterPack.query.all()
-
-    
-    decks_serialized = [deck.serialize() for deck in all_decks]
-    singles_serialized = [single.serialize() for single in all_singles]
-    boosterpack_serialized = [boosterpack.serialize() for boosterpack in all_boosterpack]
-
-    
-    response = {
-        "decks": decks_serialized,
-        "singles": singles_serialized,
-        "boosterPacks": boosterpack_serialized
-    }
-
-    return jsonify(response), 200
 
 # === API VENDEDORES ===
 
@@ -308,3 +160,66 @@ def delete_comprador(id):
     db.session.delete(comprador)
     db.session.commit()
     return jsonify({"msg": "Comprador eliminado"}), 200
+
+# === API CATEGORIAS ===
+
+@api.route('/categorias', methods=['GET'])
+def get_categorias():
+    all_categorias = Categorias.query.all()
+    results =list(map(lambda categorias:categorias.serialize(),all_categorias ))
+  
+    return jsonify(results), 200
+
+@api.route('/categorias/<int:id>', methods=['GET'])
+def get_categoria(id):
+    categoria = Categorias.query.get(id)
+    if not categoria:
+        return jsonify({"msg": "Categoria no encontrado"}), 404
+    return jsonify(categoria.serialize()), 200
+
+@api.route('/categorias', methods=['POST'])
+def create_categoria():
+    body = request.get_json()
+    required_fields = ["name", ]
+    if not all(field in body for field in required_fields):
+        return jsonify({"msg": "Se necesita un nombre para la categoria"}), 400
+
+    if Categorias.query.filter_by(name=body["name"]).first():
+        return jsonify({"msg": "El nombre de la categoria ya existe"}), 400
+   
+
+    categoria = Categorias(
+        name=body["name"],
+        
+    )
+    db.session.add(categoria)
+    db.session.commit()
+    return jsonify(categoria.serialize()), 201
+
+@api.route('/categorias/<int:id>', methods=['PUT'])
+def update_categoria(id):
+    categoria = Categorias.query.get(id)
+    if not categoria:
+        return jsonify({"msg": "Categoria no encontrado"}), 404
+
+    body = request.get_json()
+
+    if "name" in body:
+        existing_name = Categorias.query.filter_by(name=body["name"]).first()
+        if existing_name and existing_name.id != id:
+            return jsonify({"msg": "El nombre de la categoria ya se esta utilizando"}), 400
+
+    categoria.name = body.get("name", categoria.name)
+  
+    db.session.commit()
+    return jsonify(categoria.serialize()), 200
+
+@api.route('/categorias/<int:id>', methods=['DELETE'])
+def delete_categoria(id):
+    categoria = Categorias.query.get(id)
+    if not categoria:
+        return jsonify({"msg": "Categoria no encontrado"}), 404
+
+    db.session.delete(categoria)
+    db.session.commit()
+    return jsonify({"msg": "La categoria fue eliminada"}), 200

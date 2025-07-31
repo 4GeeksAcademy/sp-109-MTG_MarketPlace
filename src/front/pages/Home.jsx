@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react"
 import rigoImageUrl from "../assets/img/rigo-baby.jpg";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
-import Form from "../components/Form.jsx";
-import Data from "../components/Data.jsx";
+
+
 
 export const Home = () => {
     const { store, dispatch } = useGlobalReducer()
@@ -31,7 +31,7 @@ export const Home = () => {
                 <img src={rigoImageUrl} className="img-fluid rounded-circle mb-3" alt="Rigo Baby" />
               
             </p>  
-            <Data />
+            
             <div className="alert alert-info">
                 {store.message ? (
                     <span>{store.message}</span>

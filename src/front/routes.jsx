@@ -8,11 +8,15 @@ import { Layout } from "./pages/Layout";
 import { Home } from "./pages/Home";
 import { Single } from "./pages/Single";
 import { Demo } from "./pages/Demo";
+
 import { VendedoresLista } from "./pages/VendedorLista";
 import { VendedorForm } from "./pages/VendedorForm";
 
 import { CompradorLista } from "./pages/CompradorLista";
 import { CompradorForm } from "./pages/CompradorForm";
+
+import { CategoriaLista } from "./pages/CategoriaLista";
+import { CategoriaForm } from "./pages/CategoriaForm";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -20,6 +24,7 @@ export const router = createBrowserRouter(
       <Route path="/" element={<Home />} />
       <Route path="/single/:theId" element={<Single />} />
       <Route path="/demo" element={<Demo />} />
+
       <Route path="/vendedores" element={<VendedoresLista />} />
       <Route path="/vendedores/crear" element={<VendedorForm />} />
       <Route path="/vendedores/editar/:id" element={<VendedorForm />} />
@@ -27,6 +32,12 @@ export const router = createBrowserRouter(
       <Route path="/compradores" element={<CompradorLista />} />
       <Route path="/compradores/nuevo" element={<CompradorForm />} />
       <Route path="/compradores/editar/:id" element={<CompradorForm />} />
+
+      <Route path="/categorias" element={<CategoriaLista />} />
+      <Route path="/categorias/nuevo" element={<CategoriaForm />} />
+      <Route path="/categorias/editar/:id" element={<CategoriaForm />} /> 
+
+
     </Route>
   )
 );
