@@ -1,20 +1,16 @@
-from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Vendedor, Producto, Comprador
+from flask import Flask, request, jsonify, Blueprint
+from api.models import db, User, Vendedor, Producto, Comprador, Carrito, ItemCarrito
 from api.utils import generate_sitemap, APIException
-from flask_cors import CORS
+
 
 api = Blueprint('api', __name__)
-#CORS(api)
 
-# === ENDPOINTS ===
 
-@api.route('/hello', methods=['POST', 'GET'])
+# === GENERAL ===
+
+@api.route('/hello', methods=['GET', 'POST'])
 def handle_hello():
-    response_body = {
-        "message": "En funcionamiento"
-    }
-    return jsonify(response_body), 200
-
+    return jsonify({"message": "En funcionamiento"}), 200
 
 # === API PRODUCTOS ===
 
@@ -33,21 +29,17 @@ def get_producto(id):
 @api.route('/productos', methods=['POST'])
 def create_producto():
     data = request.get_json()
+    if not data:
+        return jsonify({"msg": "Body vacío"}), 400
+
     required_fields = ["nombre", "descripcion", "precio", "vendedor_id"]
     if not all(field in data for field in required_fields):
         return jsonify({"msg": "Faltan datos"}), 400
 
-    # Verificar si el vendedor existe
-    vendedor = Vendedor.query.get(data["vendedor_id"])
-    if not vendedor:
+    if not Vendedor.query.get(data["vendedor_id"]):
         return jsonify({"msg": "El vendedor no existe"}), 400
 
-    producto = Producto(
-        nombre=data["nombre"],
-        descripcion=data["descripcion"],
-        precio=data["precio"],
-        vendedor_id=data["vendedor_id"]
-    )
+    producto = Producto(**{k: data[k] for k in required_fields})
     db.session.add(producto)
     db.session.commit()
     return jsonify(producto.serialize()), 201
@@ -59,17 +51,17 @@ def update_producto(id):
         return jsonify({"msg": "Producto no encontrado"}), 404
 
     data = request.get_json()
+    if not data:
+        return jsonify({"msg": "Body vacío"}), 400
+
     producto.nombre = data.get("nombre", producto.nombre)
     producto.descripcion = data.get("descripcion", producto.descripcion)
     producto.precio = data.get("precio", producto.precio)
 
-    # Solo actualizar vendedor si viene en el body y es válido
-    new_vendedor_id = data.get("vendedor_id")
-    if new_vendedor_id:
-        vendedor = Vendedor.query.get(new_vendedor_id)
-        if not vendedor:
+    if "vendedor_id" in data:
+        if not Vendedor.query.get(data["vendedor_id"]):
             return jsonify({"msg": "Nuevo vendedor no existe"}), 400
-        producto.vendedor_id = new_vendedor_id
+        producto.vendedor_id = data["vendedor_id"]
 
     db.session.commit()
     return jsonify(producto.serialize()), 200
@@ -79,19 +71,15 @@ def delete_producto(id):
     producto = Producto.query.get(id)
     if not producto:
         return jsonify({"msg": "Producto no encontrado"}), 404
-
     db.session.delete(producto)
     db.session.commit()
     return jsonify({"msg": "Producto eliminado"}), 200
-
-
 
 # === API VENDEDORES ===
 
 @api.route('/vendedores', methods=['GET'])
 def get_all_vendedores():
-    vendedores = Vendedor.query.all()
-    return jsonify([v.serialize() for v in vendedores]), 200
+    return jsonify([v.serialize() for v in Vendedor.query.all()]), 200
 
 @api.route('/vendedores/<int:id>', methods=['GET'])
 def get_vendedor(id):
@@ -103,21 +91,18 @@ def get_vendedor(id):
 @api.route('/vendedores', methods=['POST'])
 def create_vendedor():
     body = request.get_json()
-    required_fields = ["username", "correo", "password"]
-    if not all(field in body for field in required_fields):
+    if not body:
+        return jsonify({"msg": "Body vacío"}), 400
+
+    if not all(field in body for field in ("username", "correo", "password")):
         return jsonify({"msg": "Faltan datos"}), 400
 
-    # Verificar si el correo o username ya existen
     if Vendedor.query.filter_by(username=body["username"]).first():
         return jsonify({"msg": "Nombre de usuario ya en uso"}), 400
     if Vendedor.query.filter_by(correo=body["correo"]).first():
         return jsonify({"msg": "Correo ya registrado"}), 400
 
-    vendedor = Vendedor(
-        username=body["username"],
-        correo=body["correo"],
-        password=body["password"]
-    )
+    vendedor = Vendedor(**body)
     db.session.add(vendedor)
     db.session.commit()
     return jsonify(vendedor.serialize()), 201
@@ -129,8 +114,9 @@ def update_vendedor(id):
         return jsonify({"msg": "Vendedor no encontrado"}), 404
 
     body = request.get_json()
+    if not body:
+        return jsonify({"msg": "Body vacío"}), 400
 
-    # Verificar duplicado en username o correo de OTROS vendedores
     if "username" in body:
         existing_user = Vendedor.query.filter_by(username=body["username"]).first()
         if existing_user and existing_user.id != id:
@@ -143,11 +129,7 @@ def update_vendedor(id):
 
     vendedor.username = body.get("username", vendedor.username)
     vendedor.correo = body.get("correo", vendedor.correo)
-
-   
-    new_password = body.get("password")
-    if new_password:
-        vendedor.password = new_password
+    vendedor.password = body.get("password", vendedor.password)
 
     db.session.commit()
     return jsonify(vendedor.serialize()), 200
@@ -157,17 +139,15 @@ def delete_vendedor(id):
     vendedor = Vendedor.query.get(id)
     if not vendedor:
         return jsonify({"msg": "Vendedor no encontrado"}), 404
-
     db.session.delete(vendedor)
     db.session.commit()
     return jsonify({"msg": "Vendedor eliminado"}), 200
 
-
 # === API COMPRADORES ===
+
 @api.route('/compradores', methods=['GET'])
 def get_all_compradores():
-    compradores = Comprador.query.all()
-    return jsonify([c.serialize() for c in compradores]), 200
+    return jsonify([c.serialize() for c in Comprador.query.all()]), 200
 
 @api.route('/compradores/<int:id>', methods=['GET'])
 def get_comprador(id):
@@ -179,8 +159,10 @@ def get_comprador(id):
 @api.route('/compradores', methods=['POST'])
 def create_comprador():
     body = request.get_json()
-    required_fields = ["username", "correo"]
-    if not all(field in body for field in required_fields):
+    if not body:
+        return jsonify({"msg": "Body vacío"}), 400
+
+    if not all(field in body for field in ("username", "correo")):
         return jsonify({"msg": "Faltan datos"}), 400
 
     if Comprador.query.filter_by(username=body["username"]).first():
@@ -188,10 +170,7 @@ def create_comprador():
     if Comprador.query.filter_by(correo=body["correo"]).first():
         return jsonify({"msg": "Correo ya registrado"}), 400
 
-    comprador = Comprador(
-        username=body["username"],
-        correo=body["correo"]
-    )
+    comprador = Comprador(**body)
     db.session.add(comprador)
     db.session.commit()
     return jsonify(comprador.serialize()), 201
@@ -203,6 +182,8 @@ def update_comprador(id):
         return jsonify({"msg": "Comprador no encontrado"}), 404
 
     body = request.get_json()
+    if not body:
+        return jsonify({"msg": "Body vacío"}), 400
 
     if "username" in body:
         existing_user = Comprador.query.filter_by(username=body["username"]).first()
@@ -225,7 +206,140 @@ def delete_comprador(id):
     comprador = Comprador.query.get(id)
     if not comprador:
         return jsonify({"msg": "Comprador no encontrado"}), 404
-
     db.session.delete(comprador)
     db.session.commit()
     return jsonify({"msg": "Comprador eliminado"}), 200
+
+# === API CARRITO ===
+
+@api.route('/carritos', methods=['GET'])
+def get_all_carritos():
+    carritos = Carrito.query.all()
+    return jsonify([c.serialize() for c in carritos]), 200
+
+@api.route('/carritos/<int:id>', methods=['GET'])
+def get_carrito(id):
+    carrito = Carrito.query.get(id)
+    if not carrito:
+        return jsonify({"msg": "Carrito no encontrado"}), 404
+    return jsonify(carrito.serialize()), 200
+
+@api.route('/carritos', methods=['POST'])
+def create_carrito():
+    body = request.get_json()
+    if not body or not all(k in body for k in ("id_comprador", "status")):
+        return jsonify({"msg": "Faltan datos"}), 400
+
+    if not Comprador.query.get(body["id_comprador"]):
+        return jsonify({"msg": "Comprador no válido"}), 400
+
+    carrito = Carrito(id_comprador=body["id_comprador"], status=body["status"])
+    db.session.add(carrito)
+    db.session.commit()
+    return jsonify(carrito.serialize()), 201
+
+@api.route('/carritos/<int:id>', methods=['PUT'])
+def update_carrito(id):
+    carrito = Carrito.query.get(id)
+    if not carrito:
+        return jsonify({"msg": "Carrito no encontrado"}), 404
+
+    data = request.get_json()
+    if "id_comprador" in data and not Comprador.query.get(data["id_comprador"]):
+        return jsonify({"msg": "Comprador no válido"}), 400
+
+    carrito.id_comprador = data.get("id_comprador", carrito.id_comprador)
+    carrito.status = data.get("status", carrito.status)
+
+    db.session.commit()
+    return jsonify(carrito.serialize()), 200
+
+@api.route('/carritos/<int:id>', methods=['DELETE'])
+def delete_carrito(id):
+    carrito = Carrito.query.get(id)
+    if not carrito:
+        return jsonify({"msg": "Carrito no encontrado"}), 404
+
+    db.session.delete(carrito)
+    db.session.commit()
+    return jsonify({"msg": "Carrito eliminado"}), 200
+
+# === API ITEM_CARRITO ===
+
+@api.route('/itemcarrito', methods=['GET'])
+def get_all_items():
+    items = ItemCarrito.query.all()
+    return jsonify([item.serialize() for item in items]), 200
+
+@api.route('/itemcarrito/<int:id>', methods=['GET'])
+def get_item(id):
+    item = ItemCarrito.query.get(id)
+    if not item:
+        return jsonify({"msg": "Ítem no encontrado"}), 404
+    return jsonify(item.serialize()), 200
+
+@api.route('/itemcarrito', methods=['POST'])
+def create_item():
+    body = request.get_json()
+    required_fields = ("cantidad", "producto_id", "carrito_id")
+
+    if not all(k in body for k in required_fields):
+        return jsonify({"msg": "Faltan datos"}), 400
+
+    if not Producto.query.get(body["producto_id"]):
+        return jsonify({"msg": "Producto no válido"}), 400
+
+    if not Carrito.query.get(body["carrito_id"]):
+        return jsonify({"msg": "Carrito no válido"}), 400
+
+    try:
+        new_item = ItemCarrito(
+            cantidad=body["cantidad"],
+            producto_id=body["producto_id"],
+            carrito_id=body["carrito_id"]
+        )
+        db.session.add(new_item)
+        db.session.commit()
+        return jsonify(new_item.serialize()), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": "Error al crear ítem", "error": str(e)}), 500
+
+@api.route('/itemcarrito/<int:id>', methods=['PUT'])
+def update_item(id):
+    item = ItemCarrito.query.get(id)
+    if not item:
+        return jsonify({"msg": "Ítem no encontrado"}), 404
+
+    body = request.get_json()
+
+    if "producto_id" in body and not Producto.query.get(body["producto_id"]):
+        return jsonify({"msg": "Producto no válido"}), 400
+
+    if "carrito_id" in body and not Carrito.query.get(body["carrito_id"]):
+        return jsonify({"msg": "Carrito no válido"}), 400
+
+    try:
+        item.cantidad = body.get("cantidad", item.cantidad)
+        item.producto_id = body.get("producto_id", item.producto_id)
+        item.carrito_id = body.get("carrito_id", item.carrito_id)
+
+        db.session.commit()
+        return jsonify(item.serialize()), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": "Error al actualizar ítem", "error": str(e)}), 500
+
+@api.route('/itemcarrito/<int:id>', methods=['DELETE'])
+def delete_item(id):
+    item = ItemCarrito.query.get(id)
+    if not item:
+        return jsonify({"msg": "Ítem no encontrado"}), 404
+
+    try:
+        db.session.delete(item)
+        db.session.commit()
+        return jsonify({"msg": "Ítem eliminado"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": "Error al eliminar ítem", "error": str(e)}), 500
