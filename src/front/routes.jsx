@@ -9,6 +9,8 @@ import { Home } from "./pages/Home";
 import { Single } from "./pages/Single";
 import { Demo } from "./pages/Demo";
 
+
+
 // Vendedor
 import { VendedoresLista } from "./pages/VendedorLista";
 import { VendedorForm } from "./pages/VendedorForm";
@@ -34,12 +36,20 @@ import { ItemCarritoLista } from "./pages/ItemCarritoLista";
 import { ItemCarritoForm } from "./pages/ItemCarritoForm";
 import { ItemCarritoDetalle } from "./pages/ItemCarritoDetalle";
 
+
+import { CategoriaLista } from "./pages/CategoriaLista";
+import { CategoriaForm } from "./pages/CategoriaForm";
+
 export const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<Layout />} errorElement={<h1>Not found!</h1>}>
       {/* Página principal */}
       <Route path="/" element={<Home />} />
       <Route path="/demo" element={<Demo />} />
+
+
+
+
       <Route path="/single/:theId" element={<Single />} />
 
       {/* Productos */}
@@ -48,17 +58,28 @@ export const router = createBrowserRouter(
       <Route path="/productos/editar/:id" element={<ProductoForm />} />
       <Route path="/productos/detalles/:id" element={<ProductoDetalle />} />
 
+
+
       {/* Vendedores */}
       <Route path="/vendedores" element={<VendedoresLista />} />
       <Route path="/vendedores/crear" element={<VendedorForm />} />
       <Route path="/vendedores/editar/:id" element={<VendedorForm />} />
       <Route path="/vendedores/:id/detalles" element={<VendedorDetalle />} />
 
+        
+        
       {/* Compradores */}
       <Route path="/compradores" element={<CompradorLista />} />
       <Route path="/compradores/nuevo" element={<CompradorForm />} />
       <Route path="/compradores/editar/:id" element={<CompradorForm />} />
       <Route path="/compradores/:id/detalles" element={<CompradorDetalle />} />
+        
+        
+      {/* Categorias */}
+      <Route path="/categorias" element={<CategoriaLista />} />
+      <Route path="/categorias/nuevo" element={<CategoriaForm />} />
+      <Route path="/categorias/editar/:id" element={<CategoriaForm />} /> 
+
 
       {/* Carritos */}
       <Route path="/carritos" element={<CarritoLista />} />

@@ -1,9 +1,15 @@
+
+from flask import Flask, request, jsonify, url_for, Blueprint
 from flask import Flask, request, jsonify, Blueprint
-from api.models import db, User, Vendedor, Producto, Comprador, Carrito, ItemCarrito
+from api.models import db, User, Vendedor, Producto, Comprador, Carrito, ItemCarrito, Categorias
 from api.utils import generate_sitemap, APIException
 
 
+
+
 api = Blueprint('api', __name__)
+
+#CORS(api)
 
 
 # === GENERAL ===
@@ -11,6 +17,8 @@ api = Blueprint('api', __name__)
 @api.route('/hello', methods=['GET', 'POST'])
 def handle_hello():
     return jsonify({"message": "En funcionamiento"}), 200
+
+
 
 # === API PRODUCTOS ===
 
@@ -74,6 +82,10 @@ def delete_producto(id):
     db.session.delete(producto)
     db.session.commit()
     return jsonify({"msg": "Producto eliminado"}), 200
+
+
+
+
 
 # === API VENDEDORES ===
 
@@ -209,6 +221,70 @@ def delete_comprador(id):
     db.session.delete(comprador)
     db.session.commit()
     return jsonify({"msg": "Comprador eliminado"}), 200
+
+
+# === API CATEGORIAS ===
+
+@api.route('/categorias', methods=['GET'])
+def get_categorias():
+    all_categorias = Categorias.query.all()
+    results =list(map(lambda categorias:categorias.serialize(),all_categorias ))
+  
+    return jsonify(results), 200
+
+@api.route('/categorias/<int:id>', methods=['GET'])
+def get_categoria(id):
+    categoria = Categorias.query.get(id)
+    if not categoria:
+        return jsonify({"msg": "Categoria no encontrado"}), 404
+    return jsonify(categoria.serialize()), 200
+
+@api.route('/categorias', methods=['POST'])
+def create_categoria():
+    body = request.get_json()
+    required_fields = ["name", ]
+    if not all(field in body for field in required_fields):
+        return jsonify({"msg": "Se necesita un nombre para la categoria"}), 400
+
+    if Categorias.query.filter_by(name=body["name"]).first():
+        return jsonify({"msg": "El nombre de la categoria ya existe"}), 400
+   
+
+    categoria = Categorias(
+        name=body["name"],
+        
+    )
+    db.session.add(categoria)
+    db.session.commit()
+    return jsonify(categoria.serialize()), 201
+
+@api.route('/categorias/<int:id>', methods=['PUT'])
+def update_categoria(id):
+    categoria = Categorias.query.get(id)
+    if not categoria:
+        return jsonify({"msg": "Categoria no encontrado"}), 404
+
+    body = request.get_json()
+
+    if "name" in body:
+        existing_name = Categorias.query.filter_by(name=body["name"]).first()
+        if existing_name and existing_name.id != id:
+            return jsonify({"msg": "El nombre de la categoria ya se esta utilizando"}), 400
+
+    categoria.name = body.get("name", categoria.name)
+  
+    db.session.commit()
+    return jsonify(categoria.serialize()), 200
+
+@api.route('/categorias/<int:id>', methods=['DELETE'])
+def delete_categoria(id):
+    categoria = Categorias.query.get(id)
+    if not categoria:
+        return jsonify({"msg": "Categoria no encontrado"}), 404
+
+    db.session.delete(categoria)
+    db.session.commit()
+    return jsonify({"msg": "La categoria fue eliminada"}), 200
 
 # === API CARRITO ===
 

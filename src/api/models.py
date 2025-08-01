@@ -31,20 +31,44 @@ class Vendedor(db.Model):
             "username": self.username,
             "correo": self.correo,
         }
+        
+# COMPRADOR
+class Comprador(db.Model):
+    __tablename__ = "comprador"
+
+
 
 class Comprador(db.Model):
     __tablename__ = "comprador"
+
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(120), nullable=False)
     correo: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
 
     carritos = relationship("Carrito", back_populates="comprador", cascade="all, delete")
 
+
     def serialize(self):
         return {
             "id": self.id,
             "username": self.username,
             "correo": self.correo
+        }
+    
+
+
+class Categorias(db.Model):
+    __tablename__ = "categorias"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(120), nullable=False)
+  
+
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name": self.name
+            
         }
 
 class Producto(db.Model):

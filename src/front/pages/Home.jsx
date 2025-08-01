@@ -3,6 +3,8 @@ import rigoImageUrl from "../assets/img/rigo-baby.jpg";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 
 
+
+
 export const Home = () => {
     const { store, dispatch } = useGlobalReducer()
     const loadMessage = async () => {
@@ -30,6 +32,8 @@ export const Home = () => {
                 <img src={rigoImageUrl} className="img-fluid rounded-circle mb-3" alt="Rigo Baby" />
               
             </p>  
+
+
             <div className="alert alert-info">
                 {store.message ? (
                     <span>{store.message}</span>
