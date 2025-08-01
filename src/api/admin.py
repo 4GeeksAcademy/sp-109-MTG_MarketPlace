@@ -1,10 +1,8 @@
-import os
+from .models import db, User, Vendedor, Comprador, Producto, Carrito, ItemCarrito, Categorias
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
+import os
 
-from .models import db, User, Vendedor ,Categorias
-
-from .models import db, User, Vendedor, Producto, Comprador
 
 def setup_admin(app):
     app.secret_key = os.environ.get('FLASK_APP_KEY', 'sample key')
@@ -14,14 +12,12 @@ def setup_admin(app):
    
     admin.add_view(ModelView(User, db.session))
 
-   
     admin.add_view(ModelView(User, db.session))
     admin.add_view(ModelView(Vendedor, db.session))
-
     admin.add_view(ModelView(Categorias, db.session))
-
-  
-
     admin.add_view(ModelView(Producto, db.session))
     admin.add_view(ModelView(Comprador, db.session))
+    admin.add_view(ModelView(Producto, db.session))
+    admin.add_view(ModelView(Carrito, db.session))
+    admin.add_view(ModelView(ItemCarrito, db.session))
 
