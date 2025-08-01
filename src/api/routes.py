@@ -1,5 +1,9 @@
 from flask import Flask, request, jsonify, url_for, Blueprint
+
 from api.models import db, User,  Vendedor, Comprador, Categorias
+=======
+from api.models import db, User, Vendedor, Producto, Comprador
+
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 
@@ -16,6 +20,80 @@ def handle_hello():
         "message": "En funcionamiento"
     }
     return jsonify(response_body), 200
+
+
+
+
+# === API PRODUCTOS ===
+
+@api.route('/productos', methods=['GET'])
+def get_productos():
+    productos = Producto.query.all()
+    return jsonify([p.serialize() for p in productos]), 200
+
+@api.route('/productos/<int:id>', methods=['GET'])
+def get_producto(id):
+    producto = Producto.query.get(id)
+    if not producto:
+        return jsonify({"msg": "Producto no encontrado"}), 404
+    return jsonify(producto.serialize()), 200
+
+@api.route('/productos', methods=['POST'])
+def create_producto():
+    data = request.get_json()
+    required_fields = ["nombre", "descripcion", "precio", "vendedor_id"]
+    if not all(field in data for field in required_fields):
+        return jsonify({"msg": "Faltan datos"}), 400
+
+    # Verificar si el vendedor existe
+    vendedor = Vendedor.query.get(data["vendedor_id"])
+    if not vendedor:
+        return jsonify({"msg": "El vendedor no existe"}), 400
+
+    producto = Producto(
+        nombre=data["nombre"],
+        descripcion=data["descripcion"],
+        precio=data["precio"],
+        vendedor_id=data["vendedor_id"]
+    )
+    db.session.add(producto)
+    db.session.commit()
+    return jsonify(producto.serialize()), 201
+
+@api.route('/productos/<int:id>', methods=['PUT'])
+def update_producto(id):
+    producto = Producto.query.get(id)
+    if not producto:
+        return jsonify({"msg": "Producto no encontrado"}), 404
+
+    data = request.get_json()
+    producto.nombre = data.get("nombre", producto.nombre)
+    producto.descripcion = data.get("descripcion", producto.descripcion)
+    producto.precio = data.get("precio", producto.precio)
+
+    # Solo actualizar vendedor si viene en el body y es válido
+    new_vendedor_id = data.get("vendedor_id")
+    if new_vendedor_id:
+        vendedor = Vendedor.query.get(new_vendedor_id)
+        if not vendedor:
+            return jsonify({"msg": "Nuevo vendedor no existe"}), 400
+        producto.vendedor_id = new_vendedor_id
+
+    db.session.commit()
+    return jsonify(producto.serialize()), 200
+
+@api.route('/productos/<int:id>', methods=['DELETE'])
+def delete_producto(id):
+    producto = Producto.query.get(id)
+    if not producto:
+        return jsonify({"msg": "Producto no encontrado"}), 404
+
+    db.session.delete(producto)
+    db.session.commit()
+    return jsonify({"msg": "Producto eliminado"}), 200
+
+
+
 
 # === API VENDEDORES ===
 

@@ -45,13 +45,19 @@ export const VendedoresLista = () => {
 						<th>Acciones</th>
 					</tr>
 				</thead>
-				<tbody>
+					<tbody>
 					{vendedores.map((v) => (
 						<tr key={v.id}>
 							<td>{v.id}</td>
 							<td>{v.username}</td>
 							<td>{v.correo}</td>
 							<td>
+								<button
+									className="btn btn-info btn-sm me-2"
+									onClick={() => navigate(`/vendedores/${v.id}/detalles`)}
+								>
+									Detalles
+								</button>
 								<button
 									className="btn btn-warning btn-sm me-2"
 									onClick={() => navigate(`/vendedores/editar/${v.id}`)}
