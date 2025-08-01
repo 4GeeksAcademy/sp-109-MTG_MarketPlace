@@ -286,6 +286,18 @@ def delete_categoria(id):
     db.session.commit()
     return jsonify({"msg": "La categoria fue eliminada"}), 200
 
+
+@api.route('/categorias/<int:categoria_id>', methods=['GET'])
+def get_categoria(categoria_id):
+    categoria = Categorias.query.get(categoria_id)
+    if not categoria:
+        return jsonify({"msg": "Categoría no encontrada"}), 404
+
+    return jsonify({
+        "id": categoria.id,
+        "nombre": categoria.nombre
+    }), 200
+
 # === API CARRITO ===
 
 @api.route('/carritos', methods=['GET'])

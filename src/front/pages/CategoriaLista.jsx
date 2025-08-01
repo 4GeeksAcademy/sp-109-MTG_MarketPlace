@@ -60,6 +60,9 @@ export const CategoriaLista = () => {
                 >
                   Borrar
                 </button>
+                <Link to={`/categorias/${categoria.id}`}>
+                  <button>Ver</button>
+                </Link>
               </td>
             </tr>
           ))}

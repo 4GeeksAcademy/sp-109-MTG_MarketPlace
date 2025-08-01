@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_migrate import Migrate
 from flask_cors import CORS
 from api.utils import APIException, generate_sitemap
-from .models import db, User, Vendedor, Comprador, Producto, Carrito, ItemCarrito, Categorias
+from api.models import db, User, Vendedor, Comprador, Producto, Carrito, ItemCarrito, Categorias
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands

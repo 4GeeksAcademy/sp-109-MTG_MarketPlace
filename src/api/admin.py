@@ -11,13 +11,10 @@ def setup_admin(app):
     
    
     admin.add_view(ModelView(User, db.session))
-
-    admin.add_view(ModelView(User, db.session))
     admin.add_view(ModelView(Vendedor, db.session))
     admin.add_view(ModelView(Categorias, db.session))
     admin.add_view(ModelView(Producto, db.session))
     admin.add_view(ModelView(Comprador, db.session))
-    admin.add_view(ModelView(Producto, db.session))
     admin.add_view(ModelView(Carrito, db.session))
     admin.add_view(ModelView(ItemCarrito, db.session))
 
