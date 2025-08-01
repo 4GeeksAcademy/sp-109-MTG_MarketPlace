@@ -31,12 +31,11 @@ class Vendedor(db.Model):
             "username": self.username,
             "correo": self.correo,
         }
-        
+
+
+
+
 # COMPRADOR
-class Comprador(db.Model):
-    __tablename__ = "comprador"
-
-
 
 class Comprador(db.Model):
     __tablename__ = "comprador"

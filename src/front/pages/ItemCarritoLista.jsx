@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 const API = import.meta.env.VITE_BACKEND_URL + "/api/itemcarrito";
 
-export const ItemCarritoLista = () => {
+export const ItemCarritoLista  = () => {
   const [items, setItems] = useState([]);
   const navigate = useNavigate();
 

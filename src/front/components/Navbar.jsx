@@ -20,10 +20,9 @@ export const Navbar = () => {
 
                      <Link to="/categorias">
                         <button className="btn btn-secondary">Categorias</button>
-
+                    </Link>
                     <Link to="/productos">
                         <button className="btn btn-secondary">Productos</button>
-
                     </Link>
                     <Link to="/carritos">
                         <button className="btn btn-secondary">Carritos</button>

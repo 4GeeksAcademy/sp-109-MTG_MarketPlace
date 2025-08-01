@@ -3,16 +3,16 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_migrate import Migrate
 from flask_cors import CORS
 from api.utils import APIException, generate_sitemap
-from .models import db, User, Vendedor, Comprador, Producto, Carrito, ItemCarrito, Categorias
+from api.models import db, User, Vendedor, Comprador, Producto, Carrito, ItemCarrito, Categorias
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
 
-app = Flask(__name__)
-CORS(app)
 
-ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
-static_file_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../dist/')
+
+
+
+
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -26,6 +26,14 @@ CORS(app,
      expose_headers=["Content-Type", "Authorization"],
      allow_headers=["Content-Type", "Authorization"]
 )
+
+
+
+
+ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
+static_file_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../dist/')
+
+
 # Configuración de base de datos
 db_url = os.getenv("DATABASE_URL")
 if db_url:
