@@ -21,7 +21,7 @@ class Vendedor(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(120), nullable=False)
     correo: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
-    password: Mapped[str] = mapped_column(String(120), nullable=False)
+    password: Mapped[str] = mapped_column(String(256), nullable=False)
 
     productos = relationship("Producto", back_populates="vendedor", cascade="all, delete")
 

@@ -5,6 +5,7 @@ from flask_cors import CORS
 from api.utils import APIException, generate_sitemap
 from api.models import db, User, Vendedor, Comprador, Producto, Carrito, ItemCarrito, Categorias
 from api.routes import api
+from api.auth_vendedor import auth_vendedor
 from api.admin import setup_admin
 from api.commands import setup_commands
 
@@ -17,6 +18,8 @@ from api.commands import setup_commands
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 
+
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "clave_super_secreta_cambiala")
 
 CORS(app,
      supports_credentials=True,
@@ -53,6 +56,7 @@ setup_commands(app)
 
 # Registrar API
 app.register_blueprint(api, url_prefix='/api')
+app.register_blueprint(auth_vendedor, url_prefix='/api')
 
 # Manejo de errores
 @app.errorhandler(APIException)
