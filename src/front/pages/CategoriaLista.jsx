@@ -49,20 +49,24 @@ export const CategoriaLista = () => {
               <td>{c.name}</td>
               <td>
                 <button
+                  className="btn btn-info btn-sm me-2"
+                  onClick={() => navigate(`/categorias/${c.id}/detalles`)}
+                >
+                  Ver
+                </button>
+                <button
                   className="btn btn-warning btn-sm me-2"
                   onClick={() => navigate(`/categorias/editar/${c.id}`)}
                 >
                   Editar
                 </button>
                 <button
-                  className="btn btn-danger btn-sm"
+                  className="btn btn-danger btn-sm me-2"
                   onClick={() => handleDelete(c.id)}
                 >
                   Borrar
                 </button>
-                <Link to={`/categorias/${categoria.id}`}>
-                  <button>Ver</button>
-                </Link>
+
               </td>
             </tr>
           ))}

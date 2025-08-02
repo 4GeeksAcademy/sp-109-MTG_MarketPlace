@@ -33,8 +33,6 @@ class Vendedor(db.Model):
         }
         
 # COMPRADOR
-class Comprador(db.Model):
-    __tablename__ = "comprador"
 
 
 
@@ -55,7 +53,7 @@ class Comprador(db.Model):
             "correo": self.correo
         }
     
-
+# CCATEGORIA
 
 class Categorias(db.Model):
     __tablename__ = "categorias"

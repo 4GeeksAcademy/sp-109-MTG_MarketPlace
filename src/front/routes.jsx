@@ -81,7 +81,7 @@ export const router = createBrowserRouter(
       <Route path="/categorias" element={<CategoriaLista />} />
       <Route path="/categorias/nuevo" element={<CategoriaForm />} />
       <Route path="/categorias/editar/:id" element={<CategoriaForm />} /> 
-      <Route path="/categorias/:id" element={<CategoriaDetalle />} />
+       <Route path="/categorias/:id/detalles" element={<CategoriaDetalle />} />
 
 
 
