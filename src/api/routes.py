@@ -1,11 +1,12 @@
 
 from flask import Flask, request, jsonify, url_for, Blueprint
-from flask import Flask, request, jsonify, Blueprint
 from api.models import db, User, Vendedor, Producto, Comprador, Carrito, ItemCarrito, Categorias
 from api.utils import generate_sitemap, APIException
-
-
-
+import datetime
+import jwt
+from flask import current_app as app
+from api.jwt_utils import token_required_vendedor
+from werkzeug.security import generate_password_hash, check_password_hash
 
 api = Blueprint('api', __name__)
 
@@ -102,22 +103,40 @@ def get_vendedor(id):
 
 @api.route('/vendedores', methods=['POST'])
 def create_vendedor():
-    body = request.get_json()
-    if not body:
-        return jsonify({"msg": "Body vacío"}), 400
+    try:
+        body = request.get_json()
+        print("📩 Body recibido:", body)
 
-    if not all(field in body for field in ("username", "correo", "password")):
-        return jsonify({"msg": "Faltan datos"}), 400
+        if not body:
+            return jsonify({"msg": "Body vacío"}), 400
 
-    if Vendedor.query.filter_by(username=body["username"]).first():
-        return jsonify({"msg": "Nombre de usuario ya en uso"}), 400
-    if Vendedor.query.filter_by(correo=body["correo"]).first():
-        return jsonify({"msg": "Correo ya registrado"}), 400
+        if not all(field in body for field in ("username", "correo", "password")):
+            return jsonify({"msg": "Faltan datos"}), 400
 
-    vendedor = Vendedor(**body)
-    db.session.add(vendedor)
-    db.session.commit()
-    return jsonify(vendedor.serialize()), 201
+        if Vendedor.query.filter_by(username=body["username"]).first():
+            return jsonify({"msg": "Nombre de usuario ya en uso"}), 400
+        if Vendedor.query.filter_by(correo=body["correo"]).first():
+            return jsonify({"msg": "Correo ya registrado"}), 400
+
+        hashed_password = generate_password_hash(body["password"])
+        print("🔐 Hashed password:", hashed_password)
+
+        vendedor = Vendedor(
+            username=body["username"],
+            correo=body["correo"],
+            password=hashed_password
+        )
+
+        db.session.add(vendedor)
+        db.session.commit()
+
+        print("✅ Vendedor creado:", vendedor.serialize())
+
+        return jsonify(vendedor.serialize()), 201
+
+    except Exception as e:
+        print("❌ Error en registro de vendedor:", e)
+        return jsonify({"msg": "Error interno", "error": str(e)}), 500
 
 @api.route('/vendedores/<int:id>', methods=['PUT'])
 def update_vendedor(id):
@@ -141,7 +160,10 @@ def update_vendedor(id):
 
     vendedor.username = body.get("username", vendedor.username)
     vendedor.correo = body.get("correo", vendedor.correo)
-    vendedor.password = body.get("password", vendedor.password)
+
+    # Si se envía una nueva contraseña, se hashea
+    if "password" in body and body["password"]:
+        vendedor.password = generate_password_hash(body["password"])
 
     db.session.commit()
     return jsonify(vendedor.serialize()), 200

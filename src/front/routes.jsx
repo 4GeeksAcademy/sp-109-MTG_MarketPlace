@@ -9,12 +9,16 @@ import { Home } from "./pages/Home";
 import { Single } from "./pages/Single";
 import { Demo } from "./pages/Demo";
 
+// Rutas privadas
+import { RutaPrivadaVendedor } from "./components/RutaPrivadaVendedor";
 
 
 // Vendedor
 import { VendedoresLista } from "./pages/VendedorLista";
 import { VendedorForm } from "./pages/VendedorForm";
 import { VendedorDetalle } from "./pages/VendedorDetalle";
+import { VendedorLogin } from "./pages/VendedorLogin";
+import { VendedorRegistro } from "./pages/VendedorRegistro";
 
 // Comprador
 import { CompradorLista } from "./pages/CompradorLista";
@@ -54,21 +58,52 @@ export const router = createBrowserRouter(
 
       <Route path="/single/:theId" element={<Single />} />
 
+              {/* Vendedores */}
+      <Route path="/vendedor/login" element={<VendedorLogin />} />
+      <Route path="/vendedor/registro" element={<VendedorRegistro />} />
+
+      <Route path="/vendedores" element={
+        <RutaPrivadaVendedor>
+          <VendedoresLista />
+        </RutaPrivadaVendedor>
+      } />
+      <Route path="/vendedores/crear" element={
+        <RutaPrivadaVendedor>
+          <VendedorForm />
+        </RutaPrivadaVendedor>
+      } />
+      <Route path="/vendedores/editar/:id" element={
+        <RutaPrivadaVendedor>
+          <VendedorForm />
+        </RutaPrivadaVendedor>
+      } />
+      <Route path="/vendedores/:id/detalles" element={
+        <RutaPrivadaVendedor>
+          <VendedorDetalle />
+        </RutaPrivadaVendedor>
+      } />
       {/* Productos */}
-      <Route path="/productos" element={<ProductoLista />} />
-      <Route path="/productos/nuevo" element={<ProductoForm />} />
-      <Route path="/productos/editar/:id" element={<ProductoForm />} />
-      <Route path="/productos/detalles/:id" element={<ProductoDetalle />} />
-
-
-
-      {/* Vendedores */}
-      <Route path="/vendedores" element={<VendedoresLista />} />
-      <Route path="/vendedores/crear" element={<VendedorForm />} />
-      <Route path="/vendedores/editar/:id" element={<VendedorForm />} />
-      <Route path="/vendedores/:id/detalles" element={<VendedorDetalle />} />
-
-        
+      <Route path="/productos" element={
+        <RutaPrivadaVendedor>
+          <ProductoLista />
+        </RutaPrivadaVendedor>
+      } />
+      <Route path="/productos/nuevo" element={
+        <RutaPrivadaVendedor>
+          <ProductoForm />
+        </RutaPrivadaVendedor>
+      } />
+      <Route path="/productos/editar/:id" element={
+        <RutaPrivadaVendedor>
+          <ProductoForm />
+        </RutaPrivadaVendedor>
+      } />
+      <Route path="/productos/detalles/:id" element={
+        <RutaPrivadaVendedor>
+          <ProductoDetalle />
+        </RutaPrivadaVendedor>
+      } />
+              
         
       {/* Compradores */}
       <Route path="/compradores" element={<CompradorLista />} />

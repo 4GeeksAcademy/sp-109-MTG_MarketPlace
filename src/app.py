@@ -5,12 +5,15 @@ from flask_cors import CORS
 from api.utils import APIException, generate_sitemap
 from api.models import db, User, Vendedor, Comprador, Producto, Carrito, ItemCarrito, Categorias
 from api.routes import api
+from api.auth_vendedor import auth_vendedor
 from api.admin import setup_admin
 from api.commands import setup_commands
+
 
 # Configuración de entorno
 ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
 static_file_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../dist/')
+
 
 # Crear app
 app = Flask(__name__)
@@ -18,6 +21,27 @@ app.url_map.strict_slashes = False
 
 # 🔹 Habilitar CORS para cualquier origen (debug)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
+
+
+
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "clave_super_secreta_cambiala")
+
+CORS(app,
+     supports_credentials=True,
+     resources={r"/api/*": {
+         "origins": ["https://obscure-rotary-phone-4j6j5xx96499f5qxj-3000.app.github.dev"]
+     }},
+     expose_headers=["Content-Type", "Authorization"],
+     allow_headers=["Content-Type", "Authorization"]
+)
+
+
+
+
+ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
+static_file_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../dist/')
+
+
 
 # Configuración de base de datos
 db_url = os.getenv("DATABASE_URL")
@@ -38,6 +62,7 @@ setup_commands(app)
 
 # Registrar API
 app.register_blueprint(api, url_prefix='/api')
+app.register_blueprint(auth_vendedor, url_prefix='/api')
 
 # Manejo de errores
 @app.errorhandler(APIException)
