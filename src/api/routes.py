@@ -1,12 +1,17 @@
-
-from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Vendedor, Producto, Comprador, Carrito, ItemCarrito, Categorias
+from flask import request, jsonify,Flask, url_for, Blueprint
+from api.models import db, User, Vendedor, Producto, Comprador, Carrito, ItemCarrito, Categorias, ProductoCategoria
 from api.utils import generate_sitemap, APIException
 import datetime
 import jwt
 from flask import current_app as app
 from api.jwt_utils import token_required_vendedor
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy.orm import joinedload
+from api.admin import setup_admin
+
+
+app = Flask(__name__)
+setup_admin(app)
 
 api = Blueprint('api', __name__)
 
@@ -441,3 +446,100 @@ def delete_item(id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": "Error al eliminar ítem", "error": str(e)}), 500
+
+    
+       
+# === API CATEGORIA-PRODUCTO ===
+
+@api.route('/producto-categoria', methods=['GET'])
+def get_all_producto_categoria():
+    relaciones = ProductoCategoria.query.all()
+    return jsonify([r.serialize() for r in relaciones]), 200
+@api.route('/producto-categoria/<int:id>', methods=['GET'])
+def get_producto_categoria(id):
+    pc = ProductoCategoria.query.get(id)
+    if not pc:
+        return jsonify({"error": "No encontrado"}), 404
+    return jsonify(pc.serialize()), 200
+
+
+@api.route('/producto-categoria', methods=['POST'])
+def create_producto_categoria():
+    data = request.get_json()
+    producto_id = data.get("producto_id")
+    categoria_id = data.get("categoria_id")
+
+    if not producto_id or not categoria_id:
+        return jsonify({"msg": "Producto_id y Categoria_id son requeridos"}), 400
+
+    producto = Producto.query.get(producto_id)
+    categoria = Categorias.query.get(categoria_id)
+
+    if not producto or not categoria:
+        return jsonify({"msg": "Producto o Categoría no encontrados"}), 404
+
+
+    existe = ProductoCategoria.query.filter_by(producto_id=producto_id, categoria_id=categoria_id).first()
+    if existe:
+        return jsonify({"msg": "Esta relación ya existe"}), 400
+
+    nuevo_enlace = ProductoCategoria(producto_id=producto_id, categoria_id=categoria_id)
+    db.session.add(nuevo_enlace)
+    db.session.commit()
+
+    return jsonify(nuevo_enlace.serialize()), 201
+
+@api.route('/producto-categoria/<int:id>', methods=['DELETE'])
+def delete_producto_categoria(id):
+    enlace = ProductoCategoria.query.get(id)
+    if not enlace:
+        return jsonify({"msg": "No se encontró el enlace"}), 404
+
+    db.session.delete(enlace)
+    db.session.commit()
+    return jsonify({"msg": "Enlace eliminado"}), 200
+
+@api.route('/producto-categoria/<int:id>', methods=['PUT'])
+def update_producto_categoria(id):
+    enlace = ProductoCategoria.query.get(id)
+    if not enlace:
+        return jsonify({"msg": "Enlace no encontrado"}), 404
+
+    data = request.get_json()
+    producto_id = data.get("producto_id")
+    categoria_id = data.get("categoria_id")
+
+    if not producto_id or not categoria_id:
+        return jsonify({"msg": "Producto_id y Categoria_id son requeridos"}), 400
+
+    producto = Producto.query.get(producto_id)
+    categoria = Categorias.query.get(categoria_id)
+
+    if not producto or not categoria:
+        return jsonify({"msg": "Producto o Categoría no encontrados"}), 404
+
+    # Evita duplicados
+    existe = ProductoCategoria.query.filter_by(
+        producto_id=producto_id,
+        categoria_id=categoria_id
+    ).first()
+    if existe and existe.id != id:
+        return jsonify({"msg": "Esta relación ya existe"}), 400
+
+    enlace.producto_id = producto_id
+    enlace.categoria_id = categoria_id
+    db.session.commit()
+
+    return jsonify(enlace.serialize()), 200
+
+
+
+@api.route('/producto-categoria/opciones', methods=['GET'])
+def get_producto_categoria_opciones():
+    productos = Producto.query.all()
+    categorias = Categorias.query.all()
+
+    return jsonify({
+        "productos": [p.serialize() for p in productos],
+        "categorias": [c.serialize() for c in categorias]
+    }), 200
