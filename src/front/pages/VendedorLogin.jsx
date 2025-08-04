@@ -39,6 +39,7 @@ export const VendedorLogin = () => {
 
       localStorage.setItem("tokenVendedor", data.token);
       localStorage.setItem("vendedorUsername", data.username);
+      localStorage.setItem("vendedorId", data.vendedor_id);
 
       const destino = location.state?.from?.pathname || "/vendedores";
       navigate(destino, { replace: true });

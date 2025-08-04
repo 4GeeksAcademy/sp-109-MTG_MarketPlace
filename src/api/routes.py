@@ -3,15 +3,23 @@ from api.models import db, User, Vendedor, Producto, Comprador, Carrito, ItemCar
 from api.utils import generate_sitemap, APIException
 import datetime
 import jwt
+import os
 from flask import current_app as app
 from api.jwt_utils import token_required_vendedor
 from werkzeug.security import generate_password_hash, check_password_hash
+
 from sqlalchemy.orm import joinedload
 from api.admin import setup_admin
 
 
 app = Flask(__name__)
 setup_admin(app)
+
+from functools import wraps
+from sqlalchemy import func
+from api.auth_utils import obtener_vendedor_id_desde_token
+from api.auth_utils import vendedor_required
+
 
 api = Blueprint('api', __name__)
 
@@ -41,21 +49,37 @@ def get_producto(id):
     return jsonify(producto.serialize()), 200
 
 @api.route('/productos', methods=['POST'])
-def create_producto():
+def crear_producto():
+    auth_header = request.headers.get('Authorization')
+
+    if not auth_header or not auth_header.startswith("Bearer "):
+        return jsonify({"msg": "Token requerido"}), 401
+
+    token = auth_header.split(" ")[1]
+    try:
+        payload = jwt.decode(token, os.getenv("SECRET_KEY", "clave_super_secreta_cambiala"), algorithms=["HS256"])
+        vendedor_id = payload.get("vendedor_id")
+    except jwt.ExpiredSignatureError:
+        return jsonify({"msg": "Token expirado"}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({"msg": "Token inválido"}), 401
+
     data = request.get_json()
-    if not data:
-        return jsonify({"msg": "Body vacío"}), 400
 
-    required_fields = ["nombre", "descripcion", "precio", "vendedor_id"]
-    if not all(field in data for field in required_fields):
-        return jsonify({"msg": "Faltan datos"}), 400
+   
+    if not data.get("nombre") or not data.get("precio"):
+        return jsonify({"msg": "Faltan campos requeridos"}), 400
 
-    if not Vendedor.query.get(data["vendedor_id"]):
-        return jsonify({"msg": "El vendedor no existe"}), 400
+    producto = Producto(
+        nombre=data["nombre"],
+        descripcion=data.get("descripcion", ""),
+        precio=data["precio"],
+        vendedor_id=vendedor_id  
+    )
 
-    producto = Producto(**{k: data[k] for k in required_fields})
     db.session.add(producto)
     db.session.commit()
+
     return jsonify(producto.serialize()), 201
 
 @api.route('/productos/<int:id>', methods=['PUT'])
@@ -447,6 +471,7 @@ def delete_item(id):
         db.session.rollback()
         return jsonify({"msg": "Error al eliminar ítem", "error": str(e)}), 500
 
+
     
        
 # === API CATEGORIA-PRODUCTO ===
@@ -543,3 +568,64 @@ def get_producto_categoria_opciones():
         "productos": [p.serialize() for p in productos],
         "categorias": [c.serialize() for c in categorias]
     }), 200
+
+
+# === API FLUJO_VENDEDOR ===
+
+@api.route('/vendedor/dashboard', methods=['GET'])
+@vendedor_required
+def get_vendedor_dashboard(vendedor_id):
+    vendedor_id = obtener_vendedor_id_desde_token()
+    if not vendedor_id:
+        return jsonify({"msg": "Token inválido o faltante"}), 401
+
+    vendedor = Vendedor.query.get(vendedor_id)
+    if not vendedor:
+        return jsonify({"msg": "Vendedor no encontrado"}), 404
+
+    productos = [p.serialize() for p in vendedor.productos]
+    return jsonify({
+        "vendedor": vendedor.serialize(),
+        "productos": productos
+    }), 200
+
+@api.route('/vendedor/reportes', methods=['GET'])
+@vendedor_required
+def get_reporte_ventas():
+    
+    vendedor_id = obtener_vendedor_id_desde_token()
+    if not vendedor_id:
+        return jsonify({"msg": "Token inválido o faltante"}), 401
+
+    vendedor = Vendedor.query.get(vendedor_id)
+    if not vendedor:
+        return jsonify({"msg": "Vendedor no encontrado"}), 404
+
+    estados_finalizados = ["generado", "enviado", "entregado", "pagado"]
+
+    resultados = db.session.query(
+        Producto.id,
+        Producto.nombre,
+        func.sum(ItemCarrito.cantidad).label("total_vendido"),
+        Producto.precio,
+        func.sum(ItemCarrito.cantidad * Producto.precio).label("ingresos")
+    ).join(ItemCarrito, Producto.id == ItemCarrito.producto_id
+    ).join(Carrito, ItemCarrito.carrito_id == Carrito.id
+    ).filter(
+        Producto.vendedor_id == vendedor_id,
+        Carrito.status.in_(estados_finalizados)
+    ).group_by(Producto.id).all()
+
+    reporte = [
+        {
+            "producto_id": pid,
+            "nombre": nombre,
+            "vendidos": int(cantidad),
+            "precio_unitario": float(precio),
+            "total_ingresos": float(ingresos)
+        }
+        for pid, nombre, cantidad, precio, ingresos in resultados
+    ]
+
+    return jsonify(reporte), 200
+

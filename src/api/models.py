@@ -84,8 +84,12 @@ class Producto(db.Model):
         ForeignKey('vendedor.id'), nullable=False)
 
     vendedor = relationship("Vendedor", back_populates="productos")
+
     categorias = relationship(
         "ProductoCategoria", back_populates="producto", cascade="all, delete")
+
+
+    items_carrito = relationship("ItemCarrito", back_populates="producto")  
 
     def serialize(self):
         return {
@@ -127,7 +131,7 @@ class ItemCarrito(db.Model):
     carrito_id: Mapped[int] = mapped_column(
         ForeignKey("carrito.id"), nullable=False)
 
-    producto = relationship("Producto")
+    producto = relationship("Producto", back_populates="items_carrito") 
     carrito = relationship("Carrito", back_populates="items")
 
     def serialize(self, include_carrito=True):

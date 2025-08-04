@@ -27,5 +27,7 @@ def login_vendedor():
     return jsonify({
         "token": token,
         "username": vendedor.username,
+        "id": vendedor.id,
+        "vendedor_id": vendedor.id, 
         "msg": "Login exitoso"
     }), 200
