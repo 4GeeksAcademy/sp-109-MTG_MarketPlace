@@ -46,6 +46,11 @@ import { ItemCarritoDetalle } from "./pages/ItemCarritoDetalle";
 import { CategoriaLista } from "./pages/CategoriaLista";
 import { CategoriaForm } from "./pages/CategoriaForm";
 
+
+import { ProductoCategoriaLista } from "./pages/ProductoCategoriaLista.jsx";
+import { ProductoCategoriaForm } from "./pages/ProductoCategoriaForm.jsx";
+import { ProductoCategoriaDetalle } from "./pages/ProductoCategoriaDetalle.jsx";
+
 export const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<Layout />} errorElement={<h1>Not found!</h1>}>
@@ -58,7 +63,7 @@ export const router = createBrowserRouter(
 
       <Route path="/single/:theId" element={<Single />} />
 
-              {/* Vendedores */}
+      {/* Vendedores */}
       <Route path="/vendedor/login" element={<VendedorLogin />} />
       <Route path="/vendedor/registro" element={<VendedorRegistro />} />
 
@@ -116,19 +121,19 @@ export const router = createBrowserRouter(
           <ProductoDetalle />
         </RutaPrivadaVendedor>
       } />
-              
-        
+
+
       {/* Compradores */}
       <Route path="/compradores" element={<CompradorLista />} />
       <Route path="/compradores/nuevo" element={<CompradorForm />} />
       <Route path="/compradores/editar/:id" element={<CompradorForm />} />
       <Route path="/compradores/:id/detalles" element={<CompradorDetalle />} />
-        
-        
+
+
       {/* Categorias */}
       <Route path="/categorias" element={<CategoriaLista />} />
       <Route path="/categorias/nuevo" element={<CategoriaForm />} />
-      <Route path="/categorias/editar/:id" element={<CategoriaForm />} /> 
+      <Route path="/categorias/editar/:id" element={<CategoriaForm />} />
 
 
       {/* Carritos */}
@@ -142,8 +147,14 @@ export const router = createBrowserRouter(
       <Route path="/itemcarrito/nuevo" element={<ItemCarritoForm />} />
       <Route path="/itemcarrito/editar/:id" element={<ItemCarritoForm />} />
       <Route path="/itemcarrito/detalles/:id" element={<ItemCarritoDetalle />} />
+
+      {/* Categoria.Productos */}
+
+      <Route path="/producto-categoria" element={ <ProductoCategoriaLista />} />
+      <Route path="/producto-categoria/nuevo" element={ <ProductoCategoriaForm />} />
+      <Route path="/producto-categoria/editar/:id" element={<ProductoCategoriaForm />} />
+      <Route path="/producto-categoria/:id" element={<ProductoCategoriaDetalle />} />
+   
     </Route>
   )
 );
-
-
