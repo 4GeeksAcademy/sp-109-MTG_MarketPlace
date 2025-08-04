@@ -35,9 +35,6 @@ export const Navbar = () => {
                      </Link>
 
 
-                    <Link to="/categorias">
-                        <button className="btn btn-secondary">Categorías</button>
-                    </Link>
 
                     <Link to="/productos">
                         <button className="btn btn-secondary">Productos</button>
