@@ -2,31 +2,29 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 const API = import.meta.env.VITE_BACKEND_URL + "/api/productos";
-const VENDEDORES_API = import.meta.env.VITE_BACKEND_URL + "/api/vendedores";
 
 export const ProductoForm = () => {
-  const [form, setForm] = useState({ nombre: "", descripcion: "", precio: "", vendedor_id: "" });
-  const [vendedores, setVendedores] = useState([]);
+  const [form, setForm] = useState({ nombre: "", descripcion: "", precio: "" });
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   const { id } = useParams();
   const editing = Boolean(id);
+  const token = localStorage.getItem("tokenVendedor");
 
   useEffect(() => {
     if (editing) {
       fetch(`${API}/${id}`)
         .then((res) => res.json())
-        .then((data) => setForm(data))
+        .then((data) => {
+          setForm({
+            nombre: data.nombre,
+            descripcion: data.descripcion,
+            precio: data.precio
+          });
+        })
         .catch((err) => console.error("❌ Error al cargar producto:", err));
     }
   }, [id]);
-
-  useEffect(() => {
-    fetch(VENDEDORES_API)
-      .then((res) => res.json())
-      .then(setVendedores)
-      .catch((err) => console.error("❌ Error al cargar vendedores:", err));
-  }, []);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -37,7 +35,6 @@ export const ProductoForm = () => {
     const newErrors = {};
     if (!form.nombre.trim()) newErrors.nombre = "El nombre es obligatorio.";
     if (!form.precio || isNaN(form.precio)) newErrors.precio = "Precio válido requerido.";
-    if (!form.vendedor_id) newErrors.vendedor_id = "Selecciona un vendedor.";
     return newErrors;
   };
 
@@ -52,9 +49,17 @@ export const ProductoForm = () => {
     try {
       const res = await fetch(editing ? `${API}/${id}` : API, {
         method: editing ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, precio: parseFloat(form.precio) }),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          nombre: form.nombre,
+          descripcion: form.descripcion,
+          precio: parseFloat(form.precio)
+        })
       });
+
       if (!res.ok) throw new Error("Error al guardar");
       navigate("/productos");
     } catch (err) {
@@ -92,24 +97,13 @@ export const ProductoForm = () => {
         />
         {errors.precio && <div className="text-danger">{errors.precio}</div>}
 
-        <select
-          name="vendedor_id"
-          className="form-control mb-2"
-          value={form.vendedor_id}
-          onChange={handleChange}
-        >
-          <option value="">-- Selecciona un vendedor --</option>
-          {vendedores.map((v) => (
-            <option key={v.id} value={v.id}>
-              {v.username} (ID: {v.id})
-            </option>
-          ))}
-        </select>
-        {errors.vendedor_id && <div className="text-danger">{errors.vendedor_id}</div>}
-
         <div className="d-flex gap-2">
           <button className="btn btn-success">{editing ? "Guardar cambios" : "Crear"}</button>
-          <button className="btn btn-secondary" type="button" onClick={() => navigate("/productos")}>
+          <button
+            className="btn btn-secondary"
+            type="button"
+            onClick={() => navigate("/productos")}
+          >
             Cancelar
           </button>
         </div>

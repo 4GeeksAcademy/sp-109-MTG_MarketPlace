@@ -8,6 +8,7 @@ export const Navbar = () => {
     const handleLogout = () => {
         localStorage.removeItem("tokenVendedor");
         localStorage.removeItem("vendedorUsername");
+        localStorage.removeItem("vendedorId"); // por si también lo guardaste
         navigate("/vendedor/login");
     };
 
@@ -43,6 +44,11 @@ export const Navbar = () => {
 
                     {tokenVendedor ? (
                         <div className="d-flex align-items-center gap-2 ms-3">
+                            <Link to="/vendedor/dashboard">
+                                <button className="btn btn-outline-primary btn-sm">
+                                    Dashboard
+                                </button>
+                            </Link>
                             <span className="fw-bold text-dark">👋 {vendedorUsername}</span>
                             <button className="btn btn-outline-danger btn-sm" onClick={handleLogout}>
                                 Cerrar sesión
