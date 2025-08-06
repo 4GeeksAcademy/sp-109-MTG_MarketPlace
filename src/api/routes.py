@@ -1,15 +1,18 @@
-
+import os
+import stripe
+from flask import Blueprint, request, jsonify
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Vendedor, Producto, Comprador, Carrito, ItemCarrito, Categorias
+from api.models import db, Vendedor, Producto, Comprador, Carrito, ItemCarrito, Categorias, Admin
 from api.utils import generate_sitemap, APIException
 import datetime
 import jwt
 from flask import current_app as app
 from api.jwt_utils import token_required_vendedor
 from werkzeug.security import generate_password_hash, check_password_hash
+from api.jwt_utils_comprador import token_required_comprador
 
 api = Blueprint('api', __name__)
-
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 #CORS(api)
 
 
@@ -441,3 +444,169 @@ def delete_item(id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": "Error al eliminar ítem", "error": str(e)}), 500
+
+# === API ADMINS ===
+
+@api.route('/admins', methods=['GET'])
+def get_all_admins():
+    return jsonify([a.serialize() for a in Admin.query.all()]), 200
+
+@api.route('/admins/<int:id>', methods=['GET'])
+def get_admin(id):
+    admin = Admin.query.get(id)
+    if not admin:
+        return jsonify({"msg": "Admin no encontrado"}), 404
+    return jsonify(admin.serialize()), 200
+
+@api.route('/admins', methods=['POST'])
+def create_admin():
+    body = request.get_json()
+    if not body:
+        return jsonify({"msg": "Body vacío"}), 400
+
+    if not all(field in body for field in ("username", "correo")):
+        return jsonify({"msg": "Faltan datos"}), 400
+
+    if Admin.query.filter_by(username=body["username"]).first():
+        return jsonify({"msg": "Nombre de usuario ya en uso"}), 400
+    if Admin.query.filter_by(correo=body["correo"]).first():
+        return jsonify({"msg": "Correo ya registrado"}), 400
+
+    admin = Admin(**body)
+    db.session.add(admin)
+    db.session.commit()
+    return jsonify(admin.serialize()), 201
+
+@api.route('/admins/<int:id>', methods=['PUT'])
+def update_admin(id):
+    admin = Admin.query.get(id)
+    if not admin:
+        return jsonify({"msg": "Admin no encontrado"}), 404
+
+    body = request.get_json()
+    if not body:
+        return jsonify({"msg": "Body vacío"}), 400
+
+    if "username" in body:
+        existing_user = Admin.query.filter_by(username=body["username"]).first()
+        if existing_user and existing_user.id != id:
+            return jsonify({"msg": "Nombre de usuario ya en uso"}), 400
+
+    if "correo" in body:
+        existing_email = Admin.query.filter_by(correo=body["correo"]).first()
+        if existing_email and existing_email.id != id:
+            return jsonify({"msg": "Correo ya registrado"}), 400
+
+    admin.username = body.get("username", admin.username)
+    admin.correo = body.get("correo", admin.correo)
+
+    db.session.commit()
+    return jsonify(admin.serialize()), 200
+
+@api.route('/admins/<int:id>', methods=['DELETE'])
+def delete_admin(id):
+    admin = Admin.query.get(id)
+    if not admin:
+        return jsonify({"msg": "Admin no encontrado"}), 404
+    db.session.delete(admin)
+    db.session.commit()
+    return jsonify({"msg": "Admin eliminado"}), 200
+
+
+
+@api.route("/orders", methods=["GET"])
+@token_required_comprador
+def get_orders():
+    compr_id = request.comprador_id
+    orders = Order.query.filter_by(comprador_id=compr_id).order_by(Order.created_at.desc()).all()
+    return jsonify([o.serialize() for o in orders]), 200
+
+@api.route("/orders/<int:id>", methods=["GET"])
+@token_required_comprador
+def get_order(id):
+    compr_id = request.comprador_id
+    order = Order.query.get(id)
+    if not order or order.comprador_id != compr_id:
+        return jsonify({"msg": "Orden no encontrada"}), 404
+    return jsonify(order.serialize()), 200
+
+@api.route("/orders", methods=["POST"])
+@token_required_comprador
+def create_order():
+    # Se asume que el carrito ya existe y se envía el cartId
+    body = request.get_json()
+    cart_id = body.get("cart_id")
+    carrito = Carrito.query.get(cart_id)
+    if not carrito or carrito.id_comprador != request.comprador_id:
+        return jsonify({"msg": "Carrito inválido"}), 400
+    total = sum(item.cantidad * item.producto.precio for item in carrito.items)
+    order = Order(comprador_id=request.comprador_id, status="paid", total=total)
+    for item in carrito.items:
+        oi = OrderItem(
+            producto_id=item.producto_id,
+            cantidad=item.cantidad,
+            precio_unitario=item.producto.precio
+        )
+        order.items.append(oi)
+    db.session.add(order)
+    carrito.status = "processed"
+    db.session.commit()
+    return jsonify(order.serialize()), 201
+
+
+
+@api.route("/orders/stripe_intent", methods=["POST"])
+@token_required_comprador
+def stripe_intent():
+    compr_id = request.comprador_id
+    body = request.get_json()
+    cart = Carrito.query.get(body["cart_id"])
+    if not cart or cart.id_comprador != compr_id:
+        return jsonify({"msg": "Carrito inválido"}), 400
+    total = sum(item.cantidad * item.producto.precio for item in cart.items)
+    intent = stripe.PaymentIntent.create(
+        amount=int(total * 100),
+        currency="eur",
+        payment_method_types=["card"],
+        metadata={"cart_id": cart.id, "user_id": compr_id},
+    )
+    order = Order(
+        comprador_id=compr_id,
+        payment_method="tarjeta",
+        status="paid",
+        total=total
+    )
+    for item in cart.items:
+        order.items.append(OrderItem(
+            producto_id=item.producto_id,
+            cantidad=item.cantidad,
+            precio_unitario=item.producto.precio
+        ))
+    db.session.add(order)
+    db.session.commit()
+    return jsonify({"clientSecret": intent.client_secret, "orderId": order.id})
+
+@api.route("/orders/offline", methods=["POST"])
+@token_required_comprador
+def offline_order():
+    compr_id = request.comprador_id
+    body = request.get_json()
+    cart = Carrito.query.get(body["cart_id"])
+    if not cart or cart.id_comprador != compr_id:
+        return jsonify({"msg": "Carrito inválido"}), 400
+    total = sum(item.cantidad * item.producto.precio for item in cart.items)
+    order = Order(
+        comprador_id=compr_id,
+        payment_method=body["metodoPago"],
+        status="pending",
+        total=total
+    )
+    for item in cart.items:
+        order.items.append(OrderItem(
+            producto_id=item.producto_id,
+            cantidad=item.cantidad,
+            precio_unitario=item.producto.precio
+        ))
+    db.session.add(order)
+    db.session.commit()
+    return jsonify({"orderId": order.id})

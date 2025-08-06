@@ -5,29 +5,50 @@ export const CarritoDetalles = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [carrito, setCarrito] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const API = import.meta.env.VITE_BACKEND_URL + `/api/carritos/${id}`;
 
+  const fetchCarrito = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(API);
+      if (!res.ok) throw new Error("Error al obtener carrito");
+      const data = await res.json();
+      setCarrito(data);
+    } catch (err) {
+      console.error("❌ Error:", err);
+      setError(err.message || "Error inesperado");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    fetch(API)
-      .then(res => {
-        if (!res.ok) throw new Error("Error al obtener carrito");
-        return res.json();
-      })
-      .then(setCarrito)
-      .catch(err => {
-        console.error("❌ Error:", err);
-        alert("No se pudo cargar el carrito.");
-      });
+    fetchCarrito();
   }, [id]);
 
-  if (!carrito) return <p className="text-center">Cargando carrito...</p>;
-
   const calcularTotal = () => {
+    if (!carrito?.items) return 0;
     return carrito.items.reduce((total, item) => {
       const precio = item.producto?.precio || 0;
       return total + item.cantidad * precio;
     }, 0);
   };
+
+  if (loading) return <p className="text-center">Cargando carrito...</p>;
+  if (error) return (
+    <div className="alert alert-danger text-center">
+      {error}
+      <br />
+      <button className="btn btn-sm btn-primary mt-2" onClick={fetchCarrito}>
+        Reintentar
+      </button>
+    </div>
+  );
+  if (!carrito) return <p>No se encontró el carrito.</p>;
 
   return (
     <div className="container mt-4">
@@ -45,7 +66,7 @@ export const CarritoDetalles = () => {
       </ul>
 
       <h4>Ítems del Carrito</h4>
-      {carrito.items.length === 0 ? (
+      {(!carrito.items || carrito.items.length === 0) ? (
         <p>Este carrito no contiene ítems.</p>
       ) : (
         <>

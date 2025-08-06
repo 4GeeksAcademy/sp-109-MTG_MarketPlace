@@ -3,17 +3,11 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_migrate import Migrate
 from flask_cors import CORS
 from api.utils import APIException, generate_sitemap
-from api.models import db, User, Vendedor, Comprador, Producto, Carrito, ItemCarrito, Categorias
+from api.models import db, Vendedor, Comprador, Producto, Carrito, ItemCarrito, Categorias, Admin
 from api.routes import api
 from api.auth_vendedor import auth_vendedor
 from api.admin import setup_admin
 from api.commands import setup_commands
-
-
-
-
-
-
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -30,12 +24,9 @@ CORS(app,
      allow_headers=["Content-Type", "Authorization"]
 )
 
-
-
-
+# Configurar entorno
 ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
 static_file_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../dist/')
-
 
 # Configuración de base de datos
 db_url = os.getenv("DATABASE_URL")
@@ -50,27 +41,28 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 MIGRATE = Migrate(app, db, compare_type=True)
 db.init_app(app)
 
-# Setup admin y comandos
+# Panel admin y comandos custom
 setup_admin(app)
 setup_commands(app)
 
-# Registrar API
+# Registrar rutas principales
 app.register_blueprint(api, url_prefix='/api')
 app.register_blueprint(auth_vendedor, url_prefix='/api')
 
-# Manejo de errores
+
+# Manejador de errores
 @app.errorhandler(APIException)
 def handle_invalid_usage(error):
     return jsonify(error.to_dict()), error.status_code
 
-# Sitemap en desarrollo
+# Sitemap solo en desarrollo
 @app.route('/')
 def sitemap():
     if ENV == "development":
         return generate_sitemap(app)
     return send_from_directory(static_file_dir, 'index.html')
 
-# Soporte para React Router en producción
+# Soporte para rutas en React Router
 @app.route('/<path:path>', methods=['GET'])
 def serve_any_other_file(path):
     file_path = os.path.join(static_file_dir, path)
@@ -80,9 +72,7 @@ def serve_any_other_file(path):
     response.cache_control.max_age = 0
     return response
 
-
-# Ejecutar servidor
-
+# Ejecutar la aplicación
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3001))
     app.run(host='0.0.0.0', port=PORT, debug=(ENV == "development"))

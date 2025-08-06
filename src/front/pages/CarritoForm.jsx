@@ -5,46 +5,76 @@ export const CarritoForm = () => {
   const { id } = useParams();
   const [form, setForm] = useState({ id_comprador: "", status: "open" });
   const [compradores, setCompradores] = useState([]);
+  const [loadingCompradores, setLoadingCompradores] = useState(true);
+  const [loadingForm, setLoadingForm] = useState(false);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
   const API = import.meta.env.VITE_BACKEND_URL + "/api/carritos" + (id ? `/${id}` : "");
 
   const estados = ["open", "pagado", "enviado", "entregado", "cancelado"];
 
   useEffect(() => {
- 
-    fetch(import.meta.env.VITE_BACKEND_URL + "/api/compradores")
-      .then(res => res.json())
-      .then(setCompradores)
-      .catch(err => console.error("❌ Error al obtener compradores:", err));
+    const fetchCompradores = async () => {
+      setLoadingCompradores(true);
+      try {
+        const res = await fetch(import.meta.env.VITE_BACKEND_URL + "/api/compradores");
+        if (!res.ok) throw new Error("Error al obtener compradores");
+        const data = await res.json();
+        setCompradores(data);
+      } catch (err) {
+        console.error("❌ Error al obtener compradores:", err);
+        setError("Error al cargar compradores");
+      } finally {
+        setLoadingCompradores(false);
+      }
+    };
 
-   
+    fetchCompradores();
+
     if (id) {
-      fetch(API)
-        .then(res => res.json())
-        .then(data => setForm(data))
-        .catch(err => console.error("❌ Error al cargar carrito:", err));
+      const fetchCarrito = async () => {
+        setLoadingForm(true);
+        try {
+          const res = await fetch(API);
+          if (!res.ok) throw new Error("Error al cargar carrito");
+          const data = await res.json();
+          setForm(data);
+        } catch (err) {
+          console.error("❌ Error al cargar carrito:", err);
+          setError("Error al cargar carrito");
+        } finally {
+          setLoadingForm(false);
+        }
+      };
+      fetchCarrito();
     }
   }, [id]);
 
   const handleChange = e =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    fetch(API, {
-      method: id ? "PUT" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    })
-      .then(res => {
-        if (res.ok) navigate("/carritos");
-        else throw new Error("Error al guardar carrito");
-      })
-      .catch(err => {
-        console.error("❌", err);
-        alert("No se pudo guardar el carrito.");
+    setError(null);
+    setLoadingForm(true);
+    try {
+      const res = await fetch(API, {
+        method: id ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
       });
+      if (!res.ok) throw new Error("Error al guardar carrito");
+      navigate("/carritos");
+    } catch (err) {
+      console.error("❌", err);
+      setError("No se pudo guardar el carrito.");
+    } finally {
+      setLoadingForm(false);
+    }
   };
+
+  if (loadingCompradores) return <p>Cargando compradores...</p>;
+  if (error) return <div className="alert alert-danger">{error}</div>;
 
   return (
     <div className="container mt-4">
@@ -84,8 +114,11 @@ export const CarritoForm = () => {
           </select>
         </div>
 
-        <button className={`btn ${id ? "btn-warning" : "btn-success"}`}>
-          {id ? "Guardar Cambios" : "Crear"}
+        <button
+          className={`btn ${id ? "btn-warning" : "btn-success"}`}
+          disabled={loadingForm}
+        >
+          {loadingForm ? "Guardando..." : (id ? "Guardar Cambios" : "Crear")}
         </button>
       </form>
     </div>

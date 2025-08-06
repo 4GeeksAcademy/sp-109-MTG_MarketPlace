@@ -5,30 +5,47 @@ const API = import.meta.env.VITE_BACKEND_URL + "/api/carritos";
 
 export const CarritoLista = () => {
   const [carritos, setCarritos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
-    fetch(API)
-      .then(res => {
+    const fetchCarritos = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(API);
         if (!res.ok) throw new Error("Error al obtener carritos");
-        return res.json();
-      })
-      .then(setCarritos)
-      .catch(err => {
+        const data = await res.json();
+        setCarritos(data);
+      } catch (err) {
         console.error("❌ Error:", err);
-        alert("No se pudieron cargar los carritos.");
-      });
+        setError("No se pudieron cargar los carritos.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCarritos();
   }, []);
 
   const handleDelete = async (id) => {
-    if (!confirm("¿Eliminar este carrito?")) return;
+    if (!window.confirm("¿Eliminar este carrito?")) return;
+    setDeletingId(id);
     try {
-      await fetch(`${API}/${id}`, { method: "DELETE" });
+      const res = await fetch(`${API}/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Error al eliminar carrito");
       setCarritos(prev => prev.filter(c => c.id !== id));
     } catch (err) {
       console.error("❌ Error al eliminar carrito:", err);
       alert("No se pudo eliminar el carrito.");
+    } finally {
+      setDeletingId(null);
     }
   };
+
+  if (loading) return <p className="text-center">Cargando carritos...</p>;
+  if (error) return <div className="alert alert-danger">{error}</div>;
 
   return (
     <div className="container mt-4">
@@ -39,34 +56,45 @@ export const CarritoLista = () => {
         <Link to="/" className="btn btn-secondary">Volver</Link>
       </div>
 
-      <table className="table table-dark table-striped">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Comprador</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {carritos.map(carrito => (
-            <tr key={carrito.id}>
-              <td>{carrito.id}</td>
-              <td>
-                {carrito.comprador?.username
-                  ? `${carrito.comprador.username} (ID: ${carrito.comprador.id})`
-                  : `N/A (ID: ${carrito.id_comprador})`}
-              </td>
-              <td>{carrito.status}</td>
-              <td>
-                <Link to={`/carritos/detalles/${carrito.id}`} className="btn btn-info btn-sm mx-1">Detalles</Link>
-                <Link to={`/carritos/editar/${carrito.id}`} className="btn btn-warning btn-sm mx-1">Editar</Link>
-                <button onClick={() => handleDelete(carrito.id)} className="btn btn-danger btn-sm mx-1">Eliminar</button>
-              </td>
+      {carritos.length === 0 ? (
+        <p>No hay carritos disponibles.</p>
+      ) : (
+        <table className="table table-dark table-striped">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Comprador</th>
+              <th>Estado</th>
+              <th>Acciones</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {carritos.map(carrito => (
+              <tr key={carrito.id}>
+                <td>{carrito.id}</td>
+                <td>
+                  {carrito.comprador?.username
+                    ? `${carrito.comprador.username} (ID: ${carrito.comprador.id})`
+                    : `N/A (ID: ${carrito.id_comprador})`}
+                </td>
+                <td>{carrito.status}</td>
+                <td>
+                  <Link to={`/carritos/detalles/${carrito.id}`} className="btn btn-info btn-sm mx-1">Detalles</Link>
+                  <Link to={`/carritos/editar/${carrito.id}`} className="btn btn-warning btn-sm mx-1">Editar</Link>
+                  <button
+                    onClick={() => handleDelete(carrito.id)}
+                    className="btn btn-danger btn-sm mx-1"
+                    disabled={deletingId === carrito.id}
+                  >
+                    {deletingId === carrito.id ? "Eliminando..." : "Eliminar"}
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
+  
 };
