@@ -40,7 +40,6 @@ class Vendedor(db.Model):
         }
 
 
-# COMPRADOR
 
 class Comprador(db.Model):
     __tablename__ = "comprador"

@@ -9,10 +9,19 @@ from api.auth_vendedor import auth_vendedor
 from api.admin import setup_admin  # ✅ Solo esta importación
 from api.commands import setup_commands
 
+# Configuración de entorno
+ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
+static_file_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../dist/')
+
+# Crear app
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 
+# 🔹 Habilitar CORS para cualquier origen (debug)
+CORS(app, resources={r"/api/*": {"origins": "*"}})
+
 # Clave secreta
+app.config['SECRET_KEY'] = 'tu_clave_secreta_aquí'
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "clave_super_secreta_cambiala")
 
 # Configuración de CORS
@@ -27,6 +36,7 @@ CORS(app,
 
 ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
 static_file_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../dist/')
+
 
 # Configuración de base de datos
 db_url = os.getenv("DATABASE_URL")

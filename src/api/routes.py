@@ -337,6 +337,8 @@ def delete_categoria(id):
     db.session.commit()
     return jsonify({"msg": "La categoria fue eliminada"}), 200
 
+
+
 # === API CARRITO ===
 
 @api.route('/carritos', methods=['GET'])

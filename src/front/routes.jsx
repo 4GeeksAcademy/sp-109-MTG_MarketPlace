@@ -42,9 +42,11 @@ import { ItemCarritoLista } from "./pages/ItemCarritoLista";
 import { ItemCarritoForm } from "./pages/ItemCarritoForm";
 import { ItemCarritoDetalle } from "./pages/ItemCarritoDetalle";
 
-
+// Categorias
 import { CategoriaLista } from "./pages/CategoriaLista";
 import { CategoriaForm } from "./pages/CategoriaForm";
+import { CategoriaDetalle } from "./pages/CategoriaDetalle";
+
 
 
 import { ProductoCategoriaLista } from "./pages/ProductoCategoriaLista.jsx";
@@ -134,6 +136,7 @@ export const router = createBrowserRouter(
       <Route path="/categorias" element={<CategoriaLista />} />
       <Route path="/categorias/nuevo" element={<CategoriaForm />} />
       <Route path="/categorias/editar/:id" element={<CategoriaForm />} />
+      <Route path="/categorias/:id/detalles" element={<CategoriaDetalle />} />
 
 
       {/* Carritos */}
