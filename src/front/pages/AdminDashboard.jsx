@@ -1,8 +1,15 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; //AGREGADO POR FERNANDO
 
 export const AdminDashboard = () => {
+  const navigate = useNavigate(); //AGREGADO POR FERNANDO
   
+
+  const handleLogout = () => { //AGREGADO POR FERNANDO
+    localStorage.removeItem("adminToken"); //AGREGADO POR FERNANDO
+    navigate("/admin-login");//AGREGADO POR FERNANDO
+  };
     //Estos numeros son de ejemplo
   const resumen = {
     totalCompradores: 120,

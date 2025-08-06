@@ -5,6 +5,9 @@ import { RouterProvider } from "react-router-dom";  // Import RouterProvider to 
 import { router } from "./routes";  // Import the router configuration
 import { StoreProvider } from './hooks/useGlobalReducer';  // Import the StoreProvider for global state management
 import { BackendURL } from './components/BackendURL';
+import { BrowserRouter } from "react-router-dom";
+
+
 
 const Main = () => {
     
@@ -27,3 +30,9 @@ const Main = () => {
 
 // Render the Main component into the root DOM element.
 ReactDOM.createRoot(document.getElementById('root')).render(<Main />)
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <BrowserRouter>
+    <AppRoutes />
+  </BrowserRouter>
+);

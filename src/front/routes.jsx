@@ -1,8 +1,11 @@
+import React from "react";
 import {
   createBrowserRouter,
   createRoutesFromElements,
-  Route,
+  Route, Routes
 } from "react-router-dom";
+
+
 
 import { Layout } from "./pages/Layout";
 import { Home } from "./pages/Home";
@@ -11,6 +14,12 @@ import { Demo } from "./pages/Demo";
 
 // Rutas privadas
 import { RutaPrivadaVendedor } from "./components/RutaPrivadaVendedor";
+
+//ADMIN
+
+import { AdminLogin } from "./pages/AdminLogin";
+import { AdminDashboard } from "./pages/AdminDashboard";
+import { RutaPrivadaAdmin } from "./components/RutaPrivadaAdmin";
 
 
 // Vendedor
@@ -58,7 +67,7 @@ export const router = createBrowserRouter(
 
       <Route path="/single/:theId" element={<Single />} />
 
-              {/* Vendedores */}
+      {/* Vendedores */}
       <Route path="/vendedor/login" element={<VendedorLogin />} />
       <Route path="/vendedor/registro" element={<VendedorRegistro />} />
 
@@ -116,19 +125,19 @@ export const router = createBrowserRouter(
           <ProductoDetalle />
         </RutaPrivadaVendedor>
       } />
-              
-        
+
+
       {/* Compradores */}
       <Route path="/compradores" element={<CompradorLista />} />
       <Route path="/compradores/nuevo" element={<CompradorForm />} />
       <Route path="/compradores/editar/:id" element={<CompradorForm />} />
       <Route path="/compradores/:id/detalles" element={<CompradorDetalle />} />
-        
-        
+
+
       {/* Categorias */}
       <Route path="/categorias" element={<CategoriaLista />} />
       <Route path="/categorias/nuevo" element={<CategoriaForm />} />
-      <Route path="/categorias/editar/:id" element={<CategoriaForm />} /> 
+      <Route path="/categorias/editar/:id" element={<CategoriaForm />} />
 
 
       {/* Carritos */}
@@ -142,8 +151,12 @@ export const router = createBrowserRouter(
       <Route path="/itemcarrito/nuevo" element={<ItemCarritoForm />} />
       <Route path="/itemcarrito/editar/:id" element={<ItemCarritoForm />} />
       <Route path="/itemcarrito/detalles/:id" element={<ItemCarritoDetalle />} />
-    </Route>
+
+      {/* --- Admin --- */}
+      <Route path="/admin-login" element={<AdminLogin />} />
+      <Route path="/admin-dashboard" element={<RutaPrivadaAdmin><AdminDashboard /></RutaPrivadaAdmin>} />
+
+  </Route>
   )
 );
-
 

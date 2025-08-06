@@ -4,14 +4,19 @@ export const Navbar = () => {
     const navigate = useNavigate();
     const tokenVendedor = localStorage.getItem("tokenVendedor");
     const vendedorUsername = localStorage.getItem("vendedorUsername");
+    const adminToken = localStorage.getItem("adminToken");
 
     const handleLogout = () => {
         localStorage.removeItem("tokenVendedor");
         localStorage.removeItem("vendedorUsername");
-        localStorage.removeItem("vendedorId"); // por si también lo guardaste
-        navigate("/vendedor/login");
+        localStorage.removeItem("vendedorId");
+        navigate("/vendedor-login");
     };
 
+    const handleAdminLogout = () => {
+        localStorage.removeItem("adminToken");
+        navigate("/admin-login");
+    };
     return (
         <nav className="navbar navbar-light bg-light shadow-sm">
             <div className="container d-flex justify-content-between align-items-center">
@@ -42,9 +47,9 @@ export const Navbar = () => {
                         <button className="btn btn-secondary">Ítems Carrito</button>
                     </Link>
 
-                    {tokenVendedor ? (
+                    {/* {tokenVendedor ? (
                         <div className="d-flex align-items-center gap-2 ms-3">
-                            <Link to="/vendedor/dashboard">
+                            <Link to="/vendedor-dashboard">
                                 <button className="btn btn-outline-primary btn-sm">
                                     Dashboard
                                 </button>
@@ -55,12 +60,23 @@ export const Navbar = () => {
                             </button>
                         </div>
                     ) : (
-                        <Link to="/vendedor/login" className="ms-2">
+                        <Link to="/vendedor-login" className="ms-2">
                             <button className="btn btn-outline-success btn-sm">
                                 Iniciar sesión
                             </button>
                         </Link>
+                    )} */}
+
+                    {adminToken ? (
+                        <button className="btn btn-danger" onClick={handleAdminLogout}>
+                            Logout Admin
+                        </button>
+                    ) : (
+                        <Link className="btn btn-warning" to="/admin-login">
+                            Login Admin
+                        </Link>
                     )}
+
                 </div>
             </div>
         </nav>
