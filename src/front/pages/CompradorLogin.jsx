@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { useNavigate, Link, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 
-export const VendedorLogin = () => {
+export const CompradorLogin = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -13,10 +13,7 @@ export const VendedorLogin = () => {
   const [error, setError] = useState("");
 
   const handleChange = e => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async e => {
@@ -24,7 +21,7 @@ export const VendedorLogin = () => {
     setError("");
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/vendedor/login`, {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/compradores/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -37,22 +34,20 @@ export const VendedorLogin = () => {
         return;
       }
 
-      localStorage.setItem("tokenVendedor", data.token);
-      localStorage.setItem("vendedorUsername", data.username);
-      localStorage.setItem("vendedorId", data.vendedor_id);
+      localStorage.setItem("tokenComprador", data.token);
+      localStorage.setItem("compradorUsername", data.username);
 
-      const destino = location.state?.from?.pathname || "/vendedores";
+      const destino = location.state?.from?.pathname || "/compradores";
       navigate(destino, { replace: true });
-
     } catch (err) {
-      console.error("❌ Error de conexión:", err);
       setError("Error al conectar con el servidor.");
+      console.error(err);
     }
   };
 
   return (
     <div className="container mt-5" style={{ maxWidth: "500px" }}>
-      <h2>Iniciar sesión como Vendedor</h2>
+      <h2>Iniciar sesión como Comprador</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label>Correo electrónico</label>
@@ -85,7 +80,7 @@ export const VendedorLogin = () => {
 
       <div className="mt-3 text-center">
         ¿No tienes cuenta?{" "}
-        <Link to="/vendedor/registro">Regístrate aquí</Link>
+        <Link to="/comprador/registro">Regístrate aquí</Link>
       </div>
     </div>
   );
