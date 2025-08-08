@@ -47,8 +47,9 @@ import { ItemCarritoLista } from "./pages/ItemCarritoLista";
 import { ItemCarritoForm } from "./pages/ItemCarritoForm";
 import { ItemCarritoDetalle } from "./pages/ItemCarritoDetalle";
 
-// Checkout
-import { Checkout } from "./pages/Checkout"; 
+// Checkout y PayPal provider
+import Checkout from "./pages/Checkout.jsx";
+import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 
 import { CategoriaLista } from "./pages/CategoriaLista";
 import { CategoriaForm } from "./pages/CategoriaForm";
@@ -157,8 +158,20 @@ export const router = createBrowserRouter(
       <Route path="/itemcarrito/editar/:id" element={<ItemCarritoForm />} />
       <Route path="/itemcarrito/detalles/:id" element={<ItemCarritoDetalle />} />
 
-      {/* Checkout */}
-      <Route path="/checkout" element={<Checkout />} /> 
+      {/* Checkout: envuelve Checkout con PayPalScriptProvider para que funcione el botón PayPal */}
+      <Route
+        path="/checkout"
+        element={
+          <PayPalScriptProvider
+            options={{
+              "client-id": import.meta.env.VITE_PAYPAL_CLIENT_ID || "sb",
+              currency: "EUR",
+            }}
+          >
+            <Checkout />
+          </PayPalScriptProvider>
+        }
+      />
     </Route>
   )
 );

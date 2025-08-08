@@ -12,57 +12,52 @@ from api.commands import setup_commands
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 
-
-app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "clave_super_secreta_cambiala")
-
-CORS(app,
-     supports_credentials=True,
-     resources={r"/api/*": {
-         "origins": ["https://obscure-rotary-phone-4j6j5xx96499f5qxj-3000.app.github.dev"]
-     }},
-     expose_headers=["Content-Type", "Authorization"],
-     allow_headers=["Content-Type", "Authorization"]
-)
-
-# Configurar entorno
+# Configuración de entorno
 ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
 static_file_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../dist/')
 
-# Configuración de base de datos
+# Clave secreta
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "clave_super_secreta_cambiala")
+
+# Configuración de la base de datos
 db_url = os.getenv("DATABASE_URL")
 if db_url:
     app.config['SQLALCHEMY_DATABASE_URI'] = db_url.replace("postgres://", "postgresql://")
 else:
     app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:////tmp/test.db"
-
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Inicializar DB y migraciones
-MIGRATE = Migrate(app, db, compare_type=True)
+# Inicialización de DB y migraciones
 db.init_app(app)
+MIGRATE = Migrate(app, db, compare_type=True)
 
-# Panel admin y comandos custom
-setup_admin(app)
-setup_commands(app)
+CORS(app,
+     supports_credentials=True,
+     origins="https://turbo-goggles-5g54rg79xxqjh6r-3000.app.github.dev",
+     expose_headers=["Content-Type", "Authorization"],
+     allow_headers=["Content-Type", "Authorization"])
 
-# Registrar rutas principales
+# Registrar Blueprints
 app.register_blueprint(api, url_prefix='/api')
 app.register_blueprint(auth_vendedor, url_prefix='/api')
 
+# Configurar Admin y comandos
+setup_admin(app)
+setup_commands(app)
 
-# Manejador de errores
+# Manejo de errores personalizados
 @app.errorhandler(APIException)
 def handle_invalid_usage(error):
     return jsonify(error.to_dict()), error.status_code
 
-# Sitemap solo en desarrollo
+# Sitemap en entorno de desarrollo
 @app.route('/')
 def sitemap():
     if ENV == "development":
         return generate_sitemap(app)
     return send_from_directory(static_file_dir, 'index.html')
 
-# Soporte para rutas en React Router
+# Soporte para React Router
 @app.route('/<path:path>', methods=['GET'])
 def serve_any_other_file(path):
     file_path = os.path.join(static_file_dir, path)
@@ -72,7 +67,7 @@ def serve_any_other_file(path):
     response.cache_control.max_age = 0
     return response
 
-# Ejecutar la aplicación
+# Ejecutar servidor
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3001))
     app.run(host='0.0.0.0', port=PORT, debug=(ENV == "development"))
