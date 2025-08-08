@@ -53,12 +53,21 @@ export const VendedorDashboard = () => {
         ))}
       </ul>
 
-      <button
-        className="btn btn-success mt-3"
-        onClick={() => navigate("/vendedor/reportes")}
-      >
-        Ver Reportes de Venta
-      </button>
+      <div className="mt-4 d-flex flex-column gap-2">
+        <button
+          className="btn btn-success"
+          onClick={() => navigate("/vendedor/reportes")}
+        >
+          Ver Reportes de Venta
+        </button>
+
+        <button
+          className="btn btn-outline-primary"
+          onClick={() => navigate("/vendedor/orders")}
+        >
+          Ver Órdenes Recibidas
+        </button>
+      </div>
     </div>
   );
 };

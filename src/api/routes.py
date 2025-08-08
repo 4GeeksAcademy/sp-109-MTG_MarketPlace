@@ -631,3 +631,89 @@ def get_reporte_ventas():
 
     return jsonify(reporte), 200
 
+
+@api.route('/vendedor/orders', methods=['GET'])
+@vendedor_required
+def get_vendedor_orders(vendedor_id):
+    try:
+        items = db.session.query(ItemCarrito).join(Producto).filter(
+            Producto.vendedor_id == vendedor_id
+        ).all()
+
+        resultado = []
+
+        for item in items:
+            resultado.append({
+                "item_id": item.id,
+                "cantidad": item.cantidad,
+                "estado": item.status if hasattr(item, 'status') else None,
+                "producto": item.producto.serialize() if item.producto else None,
+                "carrito": {
+                    "id": item.carrito.id if item.carrito else None,
+                    "estado": item.carrito.status if item.carrito else None,
+                    "comprador": item.carrito.comprador.serialize() if getattr(item.carrito, 'comprador', None) else None
+                }
+            })
+
+        return jsonify(resultado), 200
+
+    except Exception as e:
+        print("❌ ERROR EN get_vendedor_orders:", repr(e))
+        return jsonify({"msg": "Error al obtener órdenes", "error": str(e)}), 500
+
+@api.route('/vendedor/itemcarrito/<int:id>/estado', methods=['PUT'])
+@vendedor_required
+def actualizar_estado_item(id, vendedor_id):
+    item = ItemCarrito.query.get(id)
+    if not item:
+        return jsonify({"msg": "Ítem no encontrado"}), 404
+
+    if item.producto.vendedor_id != vendedor_id:
+        return jsonify({"msg": "No tienes permiso para modificar este ítem"}), 403
+
+    data = request.get_json()
+    nuevo_estado = data.get("estado")
+    ESTADOS_VALIDOS = ["get_direction", "in_progress", "enviado", "entregado"]
+
+    if nuevo_estado not in ESTADOS_VALIDOS:
+        return jsonify({"msg": f"Estado inválido. Debe ser uno de: {ESTADOS_VALIDOS}"}), 400
+
+    item.status = nuevo_estado
+    db.session.commit()
+    return jsonify(item.serialize()), 200
+
+
+@api.route('/vendedor/orden/<int:item_id>/direccion', methods=['POST'])
+@vendedor_required
+def guardar_direccion_envio(item_id, vendedor_id):
+    item = ItemCarrito.query.get(item_id)
+
+    if not item or item.producto.vendedor_id != vendedor_id:
+        return jsonify({"msg": "No autorizado"}), 403
+
+    if item.status == "in_progress":
+        return jsonify({"msg": "Esta orden ya está en proceso"}), 400
+
+    data = request.get_json()
+    direccion = data.get("direccion")
+    detalle = data.get("detalle")
+    latitud = data.get("latitud")
+    longitud = data.get("longitud")
+
+    if not direccion:
+        return jsonify({"msg": "La dirección es obligatoria"}), 400
+
+    try:
+        item.direccion_envio = direccion
+        item.detalle_envio = detalle
+        item.latitud = latitud
+        item.longitud = longitud
+        item.status = "in_progress"
+
+        db.session.commit()
+
+        return jsonify({"msg": "Dirección guardada y orden marcada como en proceso"}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": "Error al procesar la orden", "error": str(e)}), 500

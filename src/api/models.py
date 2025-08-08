@@ -123,6 +123,7 @@ class Carrito(db.Model):
 
 class ItemCarrito(db.Model):
     __tablename__ = "item_carrito"
+
     id: Mapped[int] = mapped_column(primary_key=True)
     cantidad: Mapped[int] = mapped_column(Integer, nullable=False)
     producto_id: Mapped[int] = mapped_column(
@@ -130,6 +131,11 @@ class ItemCarrito(db.Model):
     carrito_id: Mapped[int] = mapped_column(
         ForeignKey("carrito.id"), nullable=False)
 
+    status: Mapped[str] = mapped_column(String(50), default="get_direction")
+    direccion_envio: Mapped[str] = mapped_column(String(255), nullable=True)
+    detalle_envio: Mapped[str] = mapped_column(String(500), nullable=True)
+    latitud: Mapped[str] = mapped_column(String(50), nullable=True)
+    longitud: Mapped[str] = mapped_column(String(50), nullable=True)
     producto = relationship("Producto", back_populates="items_carrito") 
     carrito = relationship("Carrito", back_populates="items")
 
@@ -137,6 +143,11 @@ class ItemCarrito(db.Model):
         return {
             "id": self.id,
             "cantidad": self.cantidad,
+            "status": self.status,
+            "direccion_envio": self.direccion_envio,
+            "detalle_envio": self.detalle_envio,
+            "latitud": self.latitud,
+            "longitud": self.longitud,
             "producto_id": self.producto_id,
             "carrito_id": self.carrito_id,
             "producto": self.producto.serialize() if self.producto else None,

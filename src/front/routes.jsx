@@ -20,7 +20,9 @@ import { VendedorDetalle } from "./pages/VendedorDetalle";
 import { VendedorLogin } from "./pages/VendedorLogin";
 import { VendedorRegistro } from "./pages/VendedorRegistro";
 import { VendedorDashboard } from "./pages/VendedorDashboard";
-import { VendedorReportes } from "./pages/VendedorReportes"
+import { VendedorReportes } from "./pages/VendedorReportes";
+import { VendedorOrders } from "./pages/VendedorOrders";
+import { VendedorProcesarOrden } from "./pages/VendedorProcesarOrden";
 
 // Comprador
 import { CompradorLista } from "./pages/CompradorLista";
@@ -102,6 +104,19 @@ export const router = createBrowserRouter(
           <VendedorReportes />
         </RutaPrivadaVendedor>
       } />
+      <Route path="/vendedor/orders" element={
+        <RutaPrivadaVendedor>
+          <VendedorOrders />
+        </RutaPrivadaVendedor>
+      } />
+      <Route
+        path="/vendedor/orden/:itemId/procesar"
+        element={
+          <RutaPrivadaVendedor>
+            <VendedorProcesarOrden />
+          </RutaPrivadaVendedor>
+        }
+      />
       {/* Productos */}
       <Route path="/productos" element={
         <RutaPrivadaVendedor>
