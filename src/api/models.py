@@ -174,3 +174,18 @@ class ProductoCategoria(db.Model):
             "categoria_nombre": self.categoria.name if self.categoria else None
         }
 
+class UserAdmin(db.Model):
+    
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)  # Guardar el hash
+
+    def __repr__(self):
+        return f'<UserAdmin {self.email}>'
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "email": self.email
+        }
+ 

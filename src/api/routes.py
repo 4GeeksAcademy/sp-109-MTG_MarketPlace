@@ -1,5 +1,5 @@
-from flask import request, jsonify,Flask, url_for, Blueprint
-from api.models import db, User, Vendedor, Producto, Comprador, Carrito, ItemCarrito, Categorias, ProductoCategoria
+from flask import request, jsonify,Flask, url_for, Blueprint,current_app
+from api.models import db, User, Vendedor, Producto, Comprador, Carrito, ItemCarrito, Categorias, ProductoCategoria,UserAdmin
 from api.utils import generate_sitemap, APIException
 import datetime
 import jwt
@@ -7,6 +7,8 @@ import os
 from flask import current_app as app
 from api.jwt_utils import token_required_vendedor
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash
+
 
 from sqlalchemy.orm import joinedload
 from api.admin import setup_admin
@@ -717,3 +719,113 @@ def guardar_direccion_envio(item_id, vendedor_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": "Error al procesar la orden", "error": str(e)}), 500
+
+
+# === API ADMINISTRADOR ===
+
+        #----GET-TODOS---
+
+@api.route('/useradmin', methods=['GET'])
+def get_user_admins():
+    useradmin = UserAdmin.query.all()
+    return jsonify([admin.serialize() for admin in useradmin]), 200
+
+
+        #----GET-INDIVIDUAL---
+
+@api.route('/useradmin/<int:id>', methods=['GET'])
+def get_user_admin(id):
+    admin = UserAdmin.query.get(id)
+    if not admin:
+        return jsonify({"error": "Usuario administrador no encontrado"}), 404
+    return jsonify(admin.serialize()), 200
+
+
+        #----POST-creacion de usuario administrativo---
+
+@api.route('/useradmin', methods=['POST'])
+def create_user_admin():
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)
+
+    if not email or not password:
+        return jsonify({"msg": "Email y contraseña son requeridos"}), 400
+
+    admin_existente = UserAdmin.query.filter_by(email=email).first()
+    if admin_existente:
+        return jsonify({"msg": "Este email ya está registrado"}), 409
+
+    hashed_password = generate_password_hash(password)
+    nuevo_admin = UserAdmin(email=email, password=hashed_password)
+
+    db.session.add(nuevo_admin)
+    db.session.commit()
+
+    return jsonify({"msg": "Administrador creado exitosamente"}), 201
+
+         #----DELETE---
+
+@api.route('/useradmin/<int:id>', methods=['DELETE'])
+def delete_user_admin(id):
+    admin = UserAdmin.query.get(id)
+    if not admin:
+        return jsonify({"error": "Usuario administrador no encontrado"}), 404
+
+    db.session.delete(admin)
+    db.session.commit()
+
+    return jsonify({"msg": "Usuario administrador eliminado correctamente"}), 200
+
+        #----PUT---
+
+
+# ----PUT - actualizar usuario administrativo---
+@api.route('/useradmin/<int:id>', methods=['PUT'])
+def update_user_admin(id):
+    admin_a_actualizar = UserAdmin.query.get(id)
+
+    if not admin_a_actualizar:
+        return jsonify({"msg": "Administrador no encontrado"}), 404
+
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)
+
+    if email:
+        admin_a_actualizar.email = email
+    
+    if password:
+        admin_a_actualizar.password = generate_password_hash(password)
+
+    db.session.commit()
+
+    return jsonify({"msg": "Administrador actualizado exitosamente"}), 200
+
+
+
+@api.route('/useradmin/login', methods=['POST'])
+def login_user_admin():
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)
+
+    if not email or not password:
+        return jsonify({"msg": "Email y contraseña son requeridos"}), 400
+
+    admin = UserAdmin.query.filter_by(email=email).first()
+
+    if not admin or not check_password_hash(admin.password, password):
+        return jsonify({"msg": "Email o contraseña incorrectos"}), 401
+
+    expiration = datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+    access_token = jwt.encode({
+        "user_id": admin.id,
+        "email": admin.email,
+        "exp": expiration
+    }, current_app.config['SECRET_KEY'], algorithm="HS256")
+
+    return jsonify({
+        "msg": "Login exitoso",
+        "token": access_token,
+        "id": admin.id,
+        "email": admin.email
+    }), 200
+
