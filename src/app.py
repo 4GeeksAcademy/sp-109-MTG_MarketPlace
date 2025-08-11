@@ -17,11 +17,30 @@ static_file_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 
-# 🔹 Habilitar CORS para cualquier origen (debug)
-CORS(app)
+
 
 # Clave secreta
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "clave_super_secreta_cambiala")
+
+
+
+# Configuración de CORS
+CORS(app,
+     supports_credentials=True,
+     resources={r"/api/*": {
+         "origins": [
+             "https://cuddly-potato-pj97x6jrw59v3x77-3000.app.github.dev",
+             "https://obscure-rotary-phone-4j6j5xx96499f5qxj-3000.app.github.dev"
+         ]
+     }},
+     expose_headers=["Content-Type", "Authorization"],
+     allow_headers=["Content-Type", "Authorization"]
+)
+
+ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
+static_file_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../dist/')
+
+
 
 # Configuración de base de datos
 db_url = os.getenv("DATABASE_URL")

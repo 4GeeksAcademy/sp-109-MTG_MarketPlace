@@ -721,6 +721,27 @@ def guardar_direccion_envio(item_id, vendedor_id):
         return jsonify({"msg": "Error al procesar la orden", "error": str(e)}), 500
 
 
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+
 # === API ADMINISTRADOR ===
 
         #----GET-TODOS---
@@ -827,5 +848,29 @@ def login_user_admin():
         "token": access_token,
         "id": admin.id,
         "email": admin.email
+    }), 200
+
+
+@api.route('/itemcarrito/<int:item_id>', methods=['GET'])
+@vendedor_required
+def get_itemcarrito(item_id, vendedor_id):
+    item = ItemCarrito.query.get(item_id)
+
+    if not item:
+        return jsonify({"msg": "Item no encontrado"}), 404
+
+    # Verifica que el item le pertenece al vendedor autenticado
+    if item.producto.vendedor_id != vendedor_id:
+        return jsonify({"msg": "No autorizado"}), 403
+
+    return jsonify({
+        "id": item.id,
+        "producto_id": item.producto_id,
+        "producto_nombre": item.producto.nombre,
+        "direccion_envio": item.direccion_envio,
+        "detalle_envio": item.detalle_envio,
+        "latitud": item.latitud,
+        "longitud": item.longitud,
+        "status": item.status
     }), 200
 
