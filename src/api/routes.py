@@ -874,3 +874,4 @@ def get_itemcarrito(item_id, vendedor_id):
         "status": item.status
     }), 200
 
+
