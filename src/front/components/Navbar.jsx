@@ -12,6 +12,16 @@ export const Navbar = () => {
         navigate("/vendedor/login");
     };
 
+    const tokenUserAdmin = localStorage.getItem("tokenUserAdmin");
+    const userAdminEmail = localStorage.getItem("userAdminEmail");
+
+    const handleUserAdminLogout = () => {
+        localStorage.removeItem("tokenUserAdmin");
+        localStorage.removeItem("userAdminEmail");
+        localStorage.removeItem("userAdminId");
+        navigate("/useradmin/login");
+    };
+
     return (
         <nav className="navbar navbar-light bg-light shadow-sm">
             <div className="container d-flex justify-content-between align-items-center">
@@ -31,24 +41,24 @@ export const Navbar = () => {
                     </Link>
 
 
-                     <Link to="/categorias">
+                    <Link to="/categorias">
                         <button className="btn btn-secondary">Categorias</button>
-                     </Link>
+                    </Link>
 
 
 
                     <Link to="/productos">
                         <button className="btn btn-secondary">Productos</button>
                     </Link>
-                    
+
                     <Link to="/carritos">
                         <button className="btn btn-secondary">Carritos</button>
                     </Link>
                     <Link to="/itemcarrito">
                         <button className="btn btn-secondary">Ítems Carrito</button>
                     </Link>
-                    <Link to="/producto-categoria"> 
-                     <button className="btn btn-secondary">Producto-Categoria</button>    
+                    <Link to="/producto-categoria">
+                        <button className="btn btn-secondary">Producto-Categoria</button>
                     </Link>
 
 
@@ -70,6 +80,24 @@ export const Navbar = () => {
                             <button className="btn btn-outline-success btn-sm">
                                 Iniciar sesión
                             </button>
+                        </Link>
+                    )}
+
+                     {tokenUserAdmin ? (
+                        <div className="d-flex align-items-center gap-2 ms-3">
+                            <Link to="/useradmin">
+                                <button className="btn btn-outline-primary btn-sm">
+                                    Dashboard Admin
+                                </button>
+                            </Link>
+                            <span className="fw-bold text-dark">👋 {userAdminEmail}</span>
+                            <button className="btn btn-outline-danger btn-sm" onClick={handleUserAdminLogout}>
+                                Cerrar sesión Admin
+                            </button>
+                        </div>
+                    ) : (
+                        <Link to="/useradmin/login">
+                            <button className="btn btn-outline-success btn-sm">Iniciar sesión admin</button>
                         </Link>
                     )}
                 </div>
