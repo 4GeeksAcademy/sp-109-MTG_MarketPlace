@@ -1,0 +1,16 @@
+.contenedor-mapa {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.searchbox {
+  margin-bottom: 1rem;
+}
+
+.info-direccion {
+  margin-top: 1rem;
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 6px;
+}
