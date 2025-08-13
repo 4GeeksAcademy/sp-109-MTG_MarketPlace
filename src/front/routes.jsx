@@ -60,6 +60,7 @@ import { UserAdminLogin } from "./pages/UserAdminLogin";
 import { UserAdminForm } from "./pages/UserAdminForm";
 import { UserAdminLista } from "./pages/UserAdminLista";
 import { UserAdminDetalle } from "./pages/UserAdminDetalle.jsx";
+import { UserAdminRoute } from "./pages/UserAdminRoute.jsx";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -76,7 +77,8 @@ export const router = createBrowserRouter(
       {/* Vendedores */}
       <Route path="/vendedor/login" element={<VendedorLogin />} />
       <Route path="/vendedor/registro" element={<VendedorRegistro />} />
-      <Route path="/vendedores" element={<RutaPrivadaVendedor><VendedoresLista /></RutaPrivadaVendedor>} />
+      {/* <Route path="/vendedores" element={<RutaPrivadaVendedor><VendedoresLista /></RutaPrivadaVendedor>} /> */}
+      <Route path="/vendedores" element={<UserAdminRoute><VendedoresLista /></UserAdminRoute>} />
       <Route path="/vendedores/crear" element={<RutaPrivadaVendedor><VendedorForm /></RutaPrivadaVendedor>} />
       <Route path="/vendedores/editar/:id" element={<RutaPrivadaVendedor><VendedorForm /></RutaPrivadaVendedor>} />
       <Route path="/vendedores/:id/detalles" element={<RutaPrivadaVendedor><VendedorDetalle /></RutaPrivadaVendedor>} />
@@ -131,6 +133,7 @@ export const router = createBrowserRouter(
       <Route path="/useradmin" element={<RutaPrivadaUserAdmin><UserAdminLista /></RutaPrivadaUserAdmin>} />
       <Route path="/useradmin/:id/detalles" element={<RutaPrivadaUserAdmin><UserAdminDetalle /></RutaPrivadaUserAdmin>} />
       <Route path="/useradmin/editar/:id" element={<RutaPrivadaUserAdmin><UserAdminForm /></RutaPrivadaUserAdmin>} />
+      <Route path="/vendedores" element={<UserAdminRoute><VendedoresLista /></UserAdminRoute>} />
 
 
     </Route>

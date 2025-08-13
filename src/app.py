@@ -18,6 +18,7 @@ app = Flask(__name__)
 app.url_map.strict_slashes = False
 
 
+CORS(app)    
 
 # Clave secreta
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "clave_super_secreta_cambiala")
