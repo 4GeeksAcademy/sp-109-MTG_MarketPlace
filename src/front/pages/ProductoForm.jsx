@@ -4,10 +4,22 @@ import { useNavigate, useParams } from "react-router-dom";
 const API = import.meta.env.VITE_BACKEND_URL + "/api/productos";
 const VENDEDORES_API = import.meta.env.VITE_BACKEND_URL + "/api/vendedores";
 
+// Configuración Cloudinary
+const CLOUD_NAME = "dtewr1sbt"; 
+const UPLOAD_PRESET = "productos_preset"; 
+const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
+
 export const ProductoForm = () => {
-  const [form, setForm] = useState({ nombre: "", descripcion: "", precio: "", vendedor_id: "" });
+  const [form, setForm] = useState({
+    nombre: "",
+    descripcion: "",
+    precio: "",
+    vendedor_id: "",
+    imagen: "",
+  });
   const [vendedores, setVendedores] = useState([]);
   const [errors, setErrors] = useState({});
+  const [uploading, setUploading] = useState(false);
   const navigate = useNavigate();
   const { id } = useParams();
   const editing = Boolean(id);
@@ -31,6 +43,30 @@ export const ProductoForm = () => {
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setErrors({ ...errors, [e.target.name]: "" });
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploading(true);
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", UPLOAD_PRESET);
+
+    try {
+      const res = await fetch(CLOUDINARY_URL, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      setForm((prev) => ({ ...prev, imagen: data.secure_url }));
+    } catch (err) {
+      console.error("❌ Error subiendo imagen:", err);
+    } finally {
+      setUploading(false);
+    }
   };
 
   const validate = () => {
@@ -107,9 +143,29 @@ export const ProductoForm = () => {
         </select>
         {errors.vendedor_id && <div className="text-danger">{errors.vendedor_id}</div>}
 
+        {/* Upload de imagen */}
+        <input
+          type="file"
+          accept="image/*"
+          className="form-control mb-2"
+          onChange={handleImageUpload}
+        />
+        {uploading && <p>Subiendo imagen...</p>}
+        {form.imagen && (
+          <div className="mb-2">
+            <img src={form.imagen} alt="Vista previa" style={{ maxWidth: "200px" }} />
+          </div>
+        )}
+
         <div className="d-flex gap-2">
-          <button className="btn btn-success">{editing ? "Guardar cambios" : "Crear"}</button>
-          <button className="btn btn-secondary" type="button" onClick={() => navigate("/productos")}>
+          <button className="btn btn-success" disabled={uploading}>
+            {editing ? "Guardar cambios" : "Crear"}
+          </button>
+          <button
+            className="btn btn-secondary"
+            type="button"
+            onClick={() => navigate("/productos")}
+          >
             Cancelar
           </button>
         </div>

@@ -34,6 +34,7 @@ MIGRATE = Migrate(app, db, compare_type=True)
 CORS(app,
      supports_credentials=True,
      origins="https://turbo-goggles-5g54rg79xxqjh6r-3000.app.github.dev",
+     origins="https://turbo-goggles-5g54rg79xxqjh6r-3001.app.github.dev",
      expose_headers=["Content-Type", "Authorization"],
      allow_headers=["Content-Type", "Authorization"])
 
