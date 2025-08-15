@@ -1,8 +1,4 @@
-import {
-  createBrowserRouter,
-  createRoutesFromElements,
-  Route,
-} from "react-router-dom";
+import { createBrowserRouter, createRoutesFromElements, Route } from "react-router-dom";
 
 import { Layout } from "./pages/Layout";
 import { Home } from "./pages/Home";
@@ -23,7 +19,7 @@ import { VendedorDashboard } from "./pages/VendedorDashboard";
 import { VendedorReportes } from "./pages/VendedorReportes";
 import { VendedorOrders } from "./pages/VendedorOrders";
 import { VendedorProcesarOrden } from "./pages/VendedorProcesarOrden";
-import { VendedorPerfil } from "./pages/VendedorPerfil.jsx";
+import VendedorPerfil from "./pages/VendedorPerfil.jsx";
 
 // Comprador
 import { CompradorLista } from "./pages/CompradorLista";
@@ -45,27 +41,25 @@ import { ItemCarritoLista } from "./pages/ItemCarritoLista";
 import { ItemCarritoForm } from "./pages/ItemCarritoForm";
 import { ItemCarritoDetalle } from "./pages/ItemCarritoDetalle";
 
-// Categorias
+// Categorías
 import { CategoriaLista } from "./pages/CategoriaLista";
 import { CategoriaForm } from "./pages/CategoriaForm";
 import { CategoriaDetalle } from "./pages/CategoriaDetalle";
 
-
-// Producto-Categorias
+// Producto-Categorías
 import { ProductoCategoriaLista } from "./pages/ProductoCategoriaLista.jsx";
 import { ProductoCategoriaForm } from "./pages/ProductoCategoriaForm.jsx";
 import { ProductoCategoriaDetalle } from "./pages/ProductoCategoriaDetalle.jsx";
 
-// USerAdmin
+// UserAdmin
 import { UserAdminLogin } from "./pages/UserAdminLogin";
 import { UserAdminForm } from "./pages/UserAdminForm";
 import { UserAdminLista } from "./pages/UserAdminLista";
 import { UserAdminDetalle } from "./pages/UserAdminDetalle.jsx";
 import { UserAdminRoute } from "./pages/UserAdminRoute.jsx";
 
-
 import { CarritoUserAdminLista } from "./pages/CarritoUserAdminLista";
-import { CarritoUserAdminDetalle } from './pages/CarritoUserAdminDetalle.jsx';
+import { CarritoUserAdminDetalle } from "./pages/CarritoUserAdminDetalle.jsx";
 
 import { OrdenesUserAdminLista } from "./pages/OrdenesUserAdminLista";
 import { OrdenesUserAdminDetalle } from "./pages/OrdenesUserAdminDetalle";
@@ -73,36 +67,38 @@ import { OrdenesUserAdminDetalle } from "./pages/OrdenesUserAdminDetalle";
 export const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<Layout />} errorElement={<h1>Not found!</h1>}>
-      {/* Página principal */}
       <Route path="/" element={<Home />} />
       <Route path="/demo" element={<Demo />} />
       <Route path="/single/:theId" element={<Single />} />
 
-      {/* Vendedores */}
+      {/* Autenticación Vendedor */}
       <Route path="/vendedor/login" element={<VendedorLogin />} />
       <Route path="/vendedor/registro" element={<VendedorRegistro />} />
+
+      {/* Vendedores */}
       <Route path="/vendedores" element={<RutaPrivadaVendedor><VendedoresLista /></RutaPrivadaVendedor>} />
       <Route path="/vendedores/crear" element={<RutaPrivadaVendedor><VendedorForm /></RutaPrivadaVendedor>} />
       <Route path="/vendedores/editar/:id" element={<RutaPrivadaVendedor><VendedorForm /></RutaPrivadaVendedor>} />
-      <Route path="/vendedores/:id/detalles" element={<RutaPrivadaVendedor><VendedorDetalle /></RutaPrivadaVendedor>} /> 
-      <Route path="/vendedor/dashboard" element={<RutaPrivadaVendedor><VendedorDashboard /></RutaPrivadaVendedor>} />
-      <Route path="/vendedor/reportes" element={<RutaPrivadaVendedor><VendedorReportes /> </RutaPrivadaVendedor>} />
-      <Route path="/vendedor/orders" element={<RutaPrivadaVendedor><VendedorOrders /></RutaPrivadaVendedor>} />
-      <Route path="/vendedor/orden/:itemId/procesar" element={<RutaPrivadaVendedor><VendedorProcesarOrden /> </RutaPrivadaVendedor>} />
-      <Route path="/vendedor/perfil" element={<RutaPrivadaVendedor> <VendedorPerfil /></RutaPrivadaVendedor>}/>
+      <Route path="/vendedores/:id/detalles" element={<RutaPrivadaVendedor><VendedorDetalle /></RutaPrivadaVendedor>} />
 
+      {/* Dashboard/Reportes/Órdenes Vendedor */}
+      <Route path="/vendedor/dashboard" element={<RutaPrivadaVendedor><VendedorDashboard /></RutaPrivadaVendedor>} />
+      <Route path="/vendedor/reportes" element={<RutaPrivadaVendedor><VendedorReportes /></RutaPrivadaVendedor>} />
+      <Route path="/vendedor/orders" element={<RutaPrivadaVendedor><VendedorOrders /></RutaPrivadaVendedor>} />
+      <Route path="/vendedor/orden/:itemId/procesar" element={<RutaPrivadaVendedor><VendedorProcesarOrden /></RutaPrivadaVendedor>} />
+      <Route path="/vendedor/perfil" element={<RutaPrivadaVendedor><VendedorPerfil /></RutaPrivadaVendedor>} />
+
+      {/* Admin Vendedores */}
       <Route path="/admin/vendedores" element={<UserAdminRoute><VendedoresLista /></UserAdminRoute>} />
       <Route path="/admin/vendedores/crear" element={<UserAdminRoute><VendedorForm /></UserAdminRoute>} />
       <Route path="/admin/vendedores/:id/detalles" element={<UserAdminRoute><VendedorDetalle /></UserAdminRoute>} />
       <Route path="/admin/vendedores/editar/:id" element={<UserAdminRoute><VendedorForm /></UserAdminRoute>} />
 
-
       {/* Productos */}
       <Route path="/productos" element={<RutaPrivadaVendedor><ProductoLista /></RutaPrivadaVendedor>} />
       <Route path="/productos/nuevo" element={<RutaPrivadaVendedor><ProductoForm /></RutaPrivadaVendedor>} />
-      <Route path="/productos/editar/:id" element={<RutaPrivadaVendedor><ProductoForm /> </RutaPrivadaVendedor>} />
+      <Route path="/productos/editar/:id" element={<RutaPrivadaVendedor><ProductoForm /></RutaPrivadaVendedor>} />
       <Route path="/productos/detalles/:id" element={<RutaPrivadaVendedor><ProductoDetalle /></RutaPrivadaVendedor>} />
-
 
       {/* Compradores */}
       <Route path="/compradores" element={<CompradorLista />} />
@@ -110,13 +106,11 @@ export const router = createBrowserRouter(
       <Route path="/compradores/editar/:id" element={<CompradorForm />} />
       <Route path="/compradores/:id/detalles" element={<CompradorDetalle />} />
 
-
-      {/* Categorias */}
+      {/* Categorías */}
       <Route path="/categorias" element={<CategoriaLista />} />
       <Route path="/categorias/nuevo" element={<CategoriaForm />} />
       <Route path="/categorias/editar/:id" element={<CategoriaForm />} />
       <Route path="/categorias/:id/detalles" element={<CategoriaDetalle />} />
-
 
       {/* Carritos */}
       <Route path="/carritos" element={<CarritoLista />} />
@@ -124,14 +118,13 @@ export const router = createBrowserRouter(
       <Route path="/carritos/editar/:id" element={<CarritoForm />} />
       <Route path="/carritos/detalles/:id" element={<CarritoDetalles />} />
 
-      {/* Ítems del carrito */}
+      {/* Ítems Carrito */}
       <Route path="/itemcarrito" element={<ItemCarritoLista />} />
       <Route path="/itemcarrito/nuevo" element={<ItemCarritoForm />} />
       <Route path="/itemcarrito/editar/:id" element={<ItemCarritoForm />} />
       <Route path="/itemcarrito/detalles/:id" element={<ItemCarritoDetalle />} />
 
-      {/* Categoria.Productos */}
-
+      {/* Producto-Categorías */}
       <Route path="/producto-categoria" element={<ProductoCategoriaLista />} />
       <Route path="/producto-categoria/nuevo" element={<ProductoCategoriaForm />} />
       <Route path="/producto-categoria/editar/:id" element={<ProductoCategoriaForm />} />
@@ -143,20 +136,18 @@ export const router = createBrowserRouter(
       <Route path="/useradmin" element={<RutaPrivadaUserAdmin><UserAdminLista /></RutaPrivadaUserAdmin>} />
       <Route path="/useradmin/:id/detalles" element={<RutaPrivadaUserAdmin><UserAdminDetalle /></RutaPrivadaUserAdmin>} />
       <Route path="/useradmin/editar/:id" element={<RutaPrivadaUserAdmin><UserAdminForm /></RutaPrivadaUserAdmin>} />
-     
 
-
+      {/* UserAdmin: Carritos y Órdenes */}
       <Route path="/useradmin/carrito" element={<CarritoUserAdminLista />} />
-      <Route path="/user/admin/carritos/detalles/:id" element={<RutaPrivadaUserAdmin><CarritoUserAdminDetalle /></RutaPrivadaUserAdmin>}  />
-      
+      <Route path="/user/admin/carritos/detalles/:id" element={<RutaPrivadaUserAdmin><CarritoUserAdminDetalle /></RutaPrivadaUserAdmin>} />
       <Route path="/useradmin/ordenes" element={<RutaPrivadaUserAdmin><OrdenesUserAdminLista /></RutaPrivadaUserAdmin>} />
       <Route path="/user/admin/ordenes/detalles/:id" element={<RutaPrivadaUserAdmin><OrdenesUserAdminDetalle /></RutaPrivadaUserAdmin>} />
-    
+
+      {/* UserAdmin: Vendedores */}
       <Route path="/useradmin/vendedores" element={<UserAdminRoute><VendedoresLista /></UserAdminRoute>} />
       <Route path="/useradmin/vendedores/crear" element={<UserAdminRoute><VendedorForm /></UserAdminRoute>} />
       <Route path="/useradmin/vendedores/:id/detalles" element={<UserAdminRoute><VendedorDetalle /></UserAdminRoute>} />
       <Route path="/useradmin/vendedores/editar/:id" element={<UserAdminRoute><VendedorForm /></UserAdminRoute>} />
-
     </Route>
   )
 );

@@ -1,5 +1,11 @@
-from flask import request, jsonify,Flask, url_for, Blueprint,current_app
-from api.models import db, User, Vendedor, Producto, Comprador, Carrito, ItemCarrito, Categorias, ProductoCategoria,UserAdmin
+from uuid import uuid4
+from datetime import datetime
+from api.auth_utils import vendedor_required
+from api.auth_utils import obtener_vendedor_id_desde_token
+from sqlalchemy import func
+from functools import wraps
+from flask import request, jsonify, Flask, url_for, Blueprint, current_app
+from api.models import db, User, Vendedor, Producto, Comprador, Carrito, ItemCarrito, Categorias, ProductoCategoria, UserAdmin
 from api.utils import generate_sitemap, APIException
 import datetime
 import jwt
@@ -17,15 +23,10 @@ from api.admin import setup_admin
 app = Flask(__name__)
 setup_admin(app)
 
-from functools import wraps
-from sqlalchemy import func
-from api.auth_utils import obtener_vendedor_id_desde_token
-from api.auth_utils import vendedor_required
-
 
 api = Blueprint('api', __name__)
 
-#CORS(api)
+# CORS(api)
 
 
 # === GENERAL ===
@@ -35,7 +36,6 @@ def handle_hello():
     return jsonify({"message": "En funcionamiento"}), 200
 
 
-
 # === API PRODUCTOS ===
 
 @api.route('/productos', methods=['GET'])
@@ -43,12 +43,14 @@ def get_productos():
     productos = Producto.query.all()
     return jsonify([p.serialize() for p in productos]), 200
 
+
 @api.route('/productos/<int:id>', methods=['GET'])
 def get_producto(id):
     producto = Producto.query.get(id)
     if not producto:
         return jsonify({"msg": "Producto no encontrado"}), 404
     return jsonify(producto.serialize()), 200
+
 
 @api.route('/productos', methods=['POST'])
 def crear_producto():
@@ -59,7 +61,8 @@ def crear_producto():
 
     token = auth_header.split(" ")[1]
     try:
-        payload = jwt.decode(token, os.getenv("SECRET_KEY", "clave_super_secreta_cambiala"), algorithms=["HS256"])
+        payload = jwt.decode(token, os.getenv(
+            "SECRET_KEY", "clave_super_secreta_cambiala"), algorithms=["HS256"])
         vendedor_id = payload.get("vendedor_id")
     except jwt.ExpiredSignatureError:
         return jsonify({"msg": "Token expirado"}), 401
@@ -68,7 +71,6 @@ def crear_producto():
 
     data = request.get_json()
 
-   
     if not data.get("nombre") or not data.get("precio"):
         return jsonify({"msg": "Faltan campos requeridos"}), 400
 
@@ -76,13 +78,14 @@ def crear_producto():
         nombre=data["nombre"],
         descripcion=data.get("descripcion", ""),
         precio=data["precio"],
-        vendedor_id=vendedor_id  
+        vendedor_id=vendedor_id
     )
 
     db.session.add(producto)
     db.session.commit()
 
     return jsonify(producto.serialize()), 201
+
 
 @api.route('/productos/<int:id>', methods=['PUT'])
 def update_producto(id):
@@ -106,6 +109,7 @@ def update_producto(id):
     db.session.commit()
     return jsonify(producto.serialize()), 200
 
+
 @api.route('/productos/<int:id>', methods=['DELETE'])
 def delete_producto(id):
     producto = Producto.query.get(id)
@@ -116,14 +120,12 @@ def delete_producto(id):
     return jsonify({"msg": "Producto eliminado"}), 200
 
 
-
-
-
 # === API VENDEDORES ===
 
 @api.route('/vendedores', methods=['GET'])
 def get_all_vendedores():
     return jsonify([v.serialize() for v in Vendedor.query.all()]), 200
+
 
 @api.route('/vendedores/<int:id>', methods=['GET'])
 def get_vendedor(id):
@@ -131,6 +133,7 @@ def get_vendedor(id):
     if not vendedor:
         return jsonify({"msg": "Vendedor no encontrado"}), 404
     return jsonify(vendedor.serialize()), 200
+
 
 @api.route('/vendedores', methods=['POST'])
 def create_vendedor():
@@ -169,6 +172,7 @@ def create_vendedor():
         print("❌ Error en registro de vendedor:", e)
         return jsonify({"msg": "Error interno", "error": str(e)}), 500
 
+
 @api.route('/vendedores/<int:id>', methods=['PUT'])
 def update_vendedor(id):
     vendedor = Vendedor.query.get(id)
@@ -180,12 +184,14 @@ def update_vendedor(id):
         return jsonify({"msg": "Body vacío"}), 400
 
     if "username" in body:
-        existing_user = Vendedor.query.filter_by(username=body["username"]).first()
+        existing_user = Vendedor.query.filter_by(
+            username=body["username"]).first()
         if existing_user and existing_user.id != id:
             return jsonify({"msg": "Nombre de usuario ya en uso"}), 400
 
     if "correo" in body:
-        existing_email = Vendedor.query.filter_by(correo=body["correo"]).first()
+        existing_email = Vendedor.query.filter_by(
+            correo=body["correo"]).first()
         if existing_email and existing_email.id != id:
             return jsonify({"msg": "Correo ya registrado"}), 400
 
@@ -199,6 +205,7 @@ def update_vendedor(id):
     db.session.commit()
     return jsonify(vendedor.serialize()), 200
 
+
 @api.route('/vendedores/<int:id>', methods=['DELETE'])
 def delete_vendedor(id):
     vendedor = Vendedor.query.get(id)
@@ -210,9 +217,11 @@ def delete_vendedor(id):
 
 # === API COMPRADORES ===
 
+
 @api.route('/compradores', methods=['GET'])
 def get_all_compradores():
     return jsonify([c.serialize() for c in Comprador.query.all()]), 200
+
 
 @api.route('/compradores/<int:id>', methods=['GET'])
 def get_comprador(id):
@@ -220,6 +229,7 @@ def get_comprador(id):
     if not comprador:
         return jsonify({"msg": "Comprador no encontrado"}), 404
     return jsonify(comprador.serialize()), 200
+
 
 @api.route('/compradores', methods=['POST'])
 def create_comprador():
@@ -240,6 +250,7 @@ def create_comprador():
     db.session.commit()
     return jsonify(comprador.serialize()), 201
 
+
 @api.route('/compradores/<int:id>', methods=['PUT'])
 def update_comprador(id):
     comprador = Comprador.query.get(id)
@@ -251,12 +262,14 @@ def update_comprador(id):
         return jsonify({"msg": "Body vacío"}), 400
 
     if "username" in body:
-        existing_user = Comprador.query.filter_by(username=body["username"]).first()
+        existing_user = Comprador.query.filter_by(
+            username=body["username"]).first()
         if existing_user and existing_user.id != id:
             return jsonify({"msg": "Nombre de usuario ya en uso"}), 400
 
     if "correo" in body:
-        existing_email = Comprador.query.filter_by(correo=body["correo"]).first()
+        existing_email = Comprador.query.filter_by(
+            correo=body["correo"]).first()
         if existing_email and existing_email.id != id:
             return jsonify({"msg": "Correo ya registrado"}), 400
 
@@ -265,6 +278,7 @@ def update_comprador(id):
 
     db.session.commit()
     return jsonify(comprador.serialize()), 200
+
 
 @api.route('/compradores/<int:id>', methods=['DELETE'])
 def delete_comprador(id):
@@ -281,9 +295,11 @@ def delete_comprador(id):
 @api.route('/categorias', methods=['GET'])
 def get_categorias():
     all_categorias = Categorias.query.all()
-    results =list(map(lambda categorias:categorias.serialize(),all_categorias ))
-  
+    results = list(
+        map(lambda categorias: categorias.serialize(), all_categorias))
+
     return jsonify(results), 200
+
 
 @api.route('/categorias/<int:id>', methods=['GET'])
 def get_categoria(id):
@@ -291,6 +307,7 @@ def get_categoria(id):
     if not categoria:
         return jsonify({"msg": "Categoria no encontrado"}), 404
     return jsonify(categoria.serialize()), 200
+
 
 @api.route('/categorias', methods=['POST'])
 def create_categoria():
@@ -301,15 +318,15 @@ def create_categoria():
 
     if Categorias.query.filter_by(name=body["name"]).first():
         return jsonify({"msg": "El nombre de la categoria ya existe"}), 400
-   
 
     categoria = Categorias(
         name=body["name"],
-        
+
     )
     db.session.add(categoria)
     db.session.commit()
     return jsonify(categoria.serialize()), 201
+
 
 @api.route('/categorias/<int:id>', methods=['PUT'])
 def update_categoria(id):
@@ -325,9 +342,10 @@ def update_categoria(id):
             return jsonify({"msg": "El nombre de la categoria ya se esta utilizando"}), 400
 
     categoria.name = body.get("name", categoria.name)
-  
+
     db.session.commit()
     return jsonify(categoria.serialize()), 200
+
 
 @api.route('/categorias/<int:id>', methods=['DELETE'])
 def delete_categoria(id):
@@ -340,7 +358,6 @@ def delete_categoria(id):
     return jsonify({"msg": "La categoria fue eliminada"}), 200
 
 
-
 # === API CARRITO ===
 
 @api.route('/carritos', methods=['GET'])
@@ -348,12 +365,14 @@ def get_all_carritos():
     carritos = Carrito.query.all()
     return jsonify([c.serialize() for c in carritos]), 200
 
+
 @api.route('/carritos/<int:id>', methods=['GET'])
 def get_carrito(id):
     carrito = Carrito.query.get(id)
     if not carrito:
         return jsonify({"msg": "Carrito no encontrado"}), 404
     return jsonify(carrito.serialize()), 200
+
 
 @api.route('/carritos', methods=['POST'])
 def create_carrito():
@@ -368,6 +387,7 @@ def create_carrito():
     db.session.add(carrito)
     db.session.commit()
     return jsonify(carrito.serialize()), 201
+
 
 @api.route('/carritos/<int:id>', methods=['PUT'])
 def update_carrito(id):
@@ -385,6 +405,7 @@ def update_carrito(id):
     db.session.commit()
     return jsonify(carrito.serialize()), 200
 
+
 @api.route('/carritos/<int:id>', methods=['DELETE'])
 def delete_carrito(id):
     carrito = Carrito.query.get(id)
@@ -397,10 +418,12 @@ def delete_carrito(id):
 
 # === API ITEM_CARRITO ===
 
+
 @api.route('/itemcarrito', methods=['GET'])
 def get_all_items():
     items = ItemCarrito.query.all()
     return jsonify([item.serialize() for item in items]), 200
+
 
 @api.route('/itemcarrito/<int:id>', methods=['GET'])
 def get_item(id):
@@ -408,6 +431,7 @@ def get_item(id):
     if not item:
         return jsonify({"msg": "Ítem no encontrado"}), 404
     return jsonify(item.serialize()), 200
+
 
 @api.route('/itemcarrito', methods=['POST'])
 def create_item():
@@ -436,6 +460,7 @@ def create_item():
         db.session.rollback()
         return jsonify({"msg": "Error al crear ítem", "error": str(e)}), 500
 
+
 @api.route('/itemcarrito/<int:id>', methods=['PUT'])
 def update_item(id):
     item = ItemCarrito.query.get(id)
@@ -461,6 +486,7 @@ def update_item(id):
         db.session.rollback()
         return jsonify({"msg": "Error al actualizar ítem", "error": str(e)}), 500
 
+
 @api.route('/itemcarrito/<int:id>', methods=['DELETE'])
 def delete_item(id):
     item = ItemCarrito.query.get(id)
@@ -476,14 +502,14 @@ def delete_item(id):
         return jsonify({"msg": "Error al eliminar ítem", "error": str(e)}), 500
 
 
-    
-       
 # === API CATEGORIA-PRODUCTO ===
 
 @api.route('/producto-categoria', methods=['GET'])
 def get_all_producto_categoria():
     relaciones = ProductoCategoria.query.all()
     return jsonify([r.serialize() for r in relaciones]), 200
+
+
 @api.route('/producto-categoria/<int:id>', methods=['GET'])
 def get_producto_categoria(id):
     pc = ProductoCategoria.query.get(id)
@@ -507,16 +533,18 @@ def create_producto_categoria():
     if not producto or not categoria:
         return jsonify({"msg": "Producto o Categoría no encontrados"}), 404
 
-
-    existe = ProductoCategoria.query.filter_by(producto_id=producto_id, categoria_id=categoria_id).first()
+    existe = ProductoCategoria.query.filter_by(
+        producto_id=producto_id, categoria_id=categoria_id).first()
     if existe:
         return jsonify({"msg": "Esta relación ya existe"}), 400
 
-    nuevo_enlace = ProductoCategoria(producto_id=producto_id, categoria_id=categoria_id)
+    nuevo_enlace = ProductoCategoria(
+        producto_id=producto_id, categoria_id=categoria_id)
     db.session.add(nuevo_enlace)
     db.session.commit()
 
     return jsonify(nuevo_enlace.serialize()), 201
+
 
 @api.route('/producto-categoria/<int:id>', methods=['DELETE'])
 def delete_producto_categoria(id):
@@ -527,6 +555,7 @@ def delete_producto_categoria(id):
     db.session.delete(enlace)
     db.session.commit()
     return jsonify({"msg": "Enlace eliminado"}), 200
+
 
 @api.route('/producto-categoria/<int:id>', methods=['PUT'])
 def update_producto_categoria(id):
@@ -562,7 +591,6 @@ def update_producto_categoria(id):
     return jsonify(enlace.serialize()), 200
 
 
-
 @api.route('/producto-categoria/opciones', methods=['GET'])
 def get_producto_categoria_opciones():
     productos = Producto.query.all()
@@ -593,10 +621,11 @@ def get_vendedor_dashboard(vendedor_id):
         "productos": productos
     }), 200
 
+
 @api.route('/vendedor/reportes', methods=['GET'])
 @vendedor_required
 def get_reporte_ventas():
-    
+
     vendedor_id = obtener_vendedor_id_desde_token()
     if not vendedor_id:
         return jsonify({"msg": "Token inválido o faltante"}), 401
@@ -614,8 +643,8 @@ def get_reporte_ventas():
         Producto.precio,
         func.sum(ItemCarrito.cantidad * Producto.precio).label("ingresos")
     ).join(ItemCarrito, Producto.id == ItemCarrito.producto_id
-    ).join(Carrito, ItemCarrito.carrito_id == Carrito.id
-    ).filter(
+           ).join(Carrito, ItemCarrito.carrito_id == Carrito.id
+                  ).filter(
         Producto.vendedor_id == vendedor_id,
         Carrito.status.in_(estados_finalizados)
     ).group_by(Producto.id).all()
@@ -662,6 +691,7 @@ def get_vendedor_orders(vendedor_id):
     except Exception as e:
         print("❌ ERROR EN get_vendedor_orders:", repr(e))
         return jsonify({"msg": "Error al obtener órdenes", "error": str(e)}), 500
+
 
 @api.route('/vendedor/itemcarrito/<int:id>/estado', methods=['PUT'])
 @vendedor_required
@@ -722,90 +752,122 @@ def guardar_direccion_envio(item_id, vendedor_id):
 
 # ====   PERFIL  ====
 
+# --- Perfil: GET / PUT -------------------------------------------------
+
+
 @api.route('/vendedor/perfil', methods=['GET'])
 @vendedor_required
-def perfil_vendedor_get(vendedor_id):
-    vendedor = Vendedor.query.get(vendedor_id)
-    if not vendedor:
+def vendedor_perfil_get(vendedor_id):
+    ven = db.session.get(Vendedor, vendedor_id)
+    if not ven:
         return jsonify({"msg": "Vendedor no encontrado"}), 404
-
     return jsonify({
-        "id": vendedor.id,
-        "username": vendedor.username,
-        "correo": vendedor.correo,
-        "descripcion": getattr(vendedor, "descripcion", None),
-        "avatar_url": getattr(vendedor, "avatar_url", None)
+        "id": ven.id,
+        "username": ven.username,
+        "correo": ven.correo,
+        "descripcion": getattr(ven, "descripcion", None),
+        "imagen_url": getattr(ven, "imagen_url", None),
     }), 200
 
 
 @api.route('/vendedor/perfil', methods=['PUT'])
 @vendedor_required
-def perfil_vendedor_put(vendedor_id):
-    vendedor = Vendedor.query.get(vendedor_id)
-    if not vendedor:
+def vendedor_perfil_put(vendedor_id):
+    ven = db.session.get(Vendedor, vendedor_id)
+    if not ven:
         return jsonify({"msg": "Vendedor no encontrado"}), 404
 
-    data = request.get_json() or {}
-    vendedor.descripcion = data.get("descripcion", getattr(vendedor, "descripcion", None))
-    vendedor.avatar_url = data.get("avatar_url", getattr(vendedor, "avatar_url", None))
+    data = request.get_json(silent=True) or {}
+    ven.username = data.get("username", ven.username)
+    if "descripcion" in data:
+        ven.descripcion = data["descripcion"]
+
     db.session.commit()
+    return jsonify({
+        "username": ven.username,
+        "descripcion": ven.descripcion
+    }), 200
 
-    return jsonify({"msg": "Perfil actualizado"}), 200
 
-ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
+# --- Subida de imagen ---------------------------------------------------
+import os
+from flask import request, jsonify
+from werkzeug.utils import secure_filename  # <-- IMPORTANTE
+from api.models import db, Vendedor
 
-def allowed_file(filename: str) -> bool:
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+# carpeta para guardar avatares
+UPLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static", "avatars")
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-# --- subir imagen perfil ---
-@api.route('/vendedor/perfil/imagen', methods=['POST', 'OPTIONS'])
+ALLOWED = {"png", "jpg", "jpeg", "gif", "webp"}
+
+@api.route('/vendedor/perfil/imagen', methods=['POST'])
 @vendedor_required
-def subir_imagen_perfil(vendedor_id):
-    # preflight CORS (por si llega OPTIONS)
-    if request.method == 'OPTIONS':
-        return ('', 200)
+def vendedor_perfil_imagen(vendedor_id):
+    """
+    Sube una imagen (campo 'imagen' en FormData) y guarda la URL pública en vendedor.imagen_url
+    Respuesta: { "imagen_url": "/static/avatars/vendedor_<id>.<ext>" }
+    """
+    try:
+        if 'imagen' not in request.files:
+            return jsonify({"msg": "Falta el archivo 'imagen'"}), 400
 
-    if 'imagen' not in request.files:
-        return jsonify({"msg": "Falta el campo 'imagen' (multipart/form-data)"}), 400
+        f = request.files['imagen']
+        if not f or f.filename == '':
+            return jsonify({"msg": "Archivo vacío"}), 400
 
-    file = request.files['imagen']
-    if file.filename == '':
-        return jsonify({"msg": "Nombre de archivo vacío"}), 400
-    if not allowed_file(file.filename):
-        return jsonify({"msg": "Extensión no permitida"}), 400
+        # valida extensión
+        ext = f.filename.rsplit('.', 1)[-1].lower() if '.' in f.filename else ''
+        if ext not in ALLOWED:
+            return jsonify({"msg": "Formato no permitido"}), 400
 
-    # guardar en src/uploads
-    base_dir = os.path.dirname(os.path.realpath(__file__))  # .../src/api
-    src_dir = os.path.dirname(base_dir)                      # .../src
-    upload_dir = os.path.join(src_dir, "uploads")
-    os.makedirs(upload_dir, exist_ok=True)
+        # nombre normalizado
+        filename = secure_filename(f"vendedor_{vendedor_id}.{ext}")
+        filepath = os.path.join(UPLOAD_DIR, filename)
 
-    ext = file.filename.rsplit('.', 1)[1].lower()
-    safe_name = secure_filename(f"vend_{vendedor_id}_{int(time.time())}.{ext}")
-    file_path = os.path.join(upload_dir, safe_name)
-    file.save(file_path)
+        # guarda archivo
+        f.save(filepath)
 
-    vendedor = Vendedor.query.get(vendedor_id)
-    if not vendedor:
-        return jsonify({"msg": "Vendedor no encontrado"}), 404
+        # URL pública
+        public_url = f"/static/avatars/{filename}"
 
-    vendedor.avatar_url = f"/uploads/{safe_name}"
-    db.session.commit()
+        # actualiza el vendedor
+        ven = db.session.get(Vendedor, vendedor_id)
+        if not ven:
+            return jsonify({"msg": "Vendedor no encontrado"}), 404
 
-    return jsonify({"msg": "Imagen subida", "avatar_url": vendedor.avatar_url}), 200
-          
+        # opcional: si tenías una imagen local anterior, podrías borrarla
+        # (solo si empieza por /static/avatars/)
+        if ven.imagen_url and ven.imagen_url.startswith("/static/avatars/"):
+            try:
+                old_abs = os.path.join(os.path.dirname(os.path.dirname(__file__)), ven.imagen_url.lstrip("/"))
+                if os.path.isfile(old_abs) and old_abs != filepath:
+                    os.remove(old_abs)
+            except Exception:
+                pass
+
+        ven.imagen_url = public_url
+        db.session.commit()
+
+        return jsonify({"imagen_url": public_url}), 200
+
+    except Exception as e:
+        # Logea en consola del server para que veas el error exacto
+        print("❌ Error subiendo imagen:", repr(e))
+        return jsonify({"msg": "Error interno subiendo imagen"}), 500
 
 # === API ADMINISTRADOR ===
 
-        #----GET-TODOS---
+    # ----GET-TODOS---
+
 
 @api.route('/useradmin', methods=['GET'])
 def get_user_admins():
     useradmin = UserAdmin.query.all()
     return jsonify([admin.serialize() for admin in useradmin]), 200
 
+    # ----GET-INDIVIDUAL---
 
-        #----GET-INDIVIDUAL---
 
 @api.route('/useradmin/<int:id>', methods=['GET'])
 def get_user_admin(id):
@@ -814,8 +876,8 @@ def get_user_admin(id):
         return jsonify({"error": "Usuario administrador no encontrado"}), 404
     return jsonify(admin.serialize()), 200
 
+    # ----POST-creacion de usuario administrativo---
 
-        #----POST-creacion de usuario administrativo---
 
 @api.route('/useradmin', methods=['POST'])
 def create_user_admin():
@@ -837,7 +899,8 @@ def create_user_admin():
 
     return jsonify({"msg": "Administrador creado exitosamente"}), 201
 
-         #----DELETE---
+    # ----DELETE---
+
 
 @api.route('/useradmin/<int:id>', methods=['DELETE'])
 def delete_user_admin(id):
@@ -850,7 +913,7 @@ def delete_user_admin(id):
 
     return jsonify({"msg": "Usuario administrador eliminado correctamente"}), 200
 
-        #----PUT---
+    # ----PUT---
 
 
 # ----PUT - actualizar usuario administrativo---
@@ -866,14 +929,13 @@ def update_user_admin(id):
 
     if email:
         admin_a_actualizar.email = email
-    
+
     if password:
         admin_a_actualizar.password = generate_password_hash(password)
 
     db.session.commit()
 
     return jsonify({"msg": "Administrador actualizado exitosamente"}), 200
-
 
 
 @api.route('/useradmin/login', methods=['POST'])
@@ -926,5 +988,3 @@ def get_itemcarrito(item_id, vendedor_id):
         "longitud": item.longitud,
         "status": item.status
     }), 200
-
-
