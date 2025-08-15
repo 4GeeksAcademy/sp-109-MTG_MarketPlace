@@ -5,7 +5,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 admin_routes = Blueprint('admin_routes', __name__)
 
-# ✅ Obtener todos los vendedores
+# Obtener todos los vendedores
 @admin_routes.route("/admin/vendedores", methods=["GET"])
 @jwt_required()  # Se asegura que haya un admin logueado
 def get_all_vendedores():
@@ -16,7 +16,7 @@ def get_all_vendedores():
     vendedores = Vendedor.query.all()
     return jsonify([v.serialize() for v in vendedores]), 200
 
-# ✅ Obtener todos los compradores
+# Obtener todos los compradores
 @admin_routes.route("/admin/compradores", methods=["GET"])
 @jwt_required()
 def get_all_compradores():
