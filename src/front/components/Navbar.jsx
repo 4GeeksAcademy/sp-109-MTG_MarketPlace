@@ -22,6 +22,8 @@ export const Navbar = () => {
         navigate("/useradmin/login");
     };
 
+    const vendedoresPath = tokenUserAdmin ? "/admin/vendedores" : "/vendedores";
+
     return (
         <nav className="navbar navbar-light bg-light shadow-sm">
             <div className="container d-flex justify-content-between align-items-center">
@@ -33,8 +35,8 @@ export const Navbar = () => {
                     <Link to="/demo">
                         <button className="btn btn-primary">Check Context</button>
                     </Link>
-                    <Link to="/vendedores">
-                        <button className="btn btn-secondary">Vendedores</button>
+                    <Link to={vendedoresPath} className="hover:text-gray-300">
+                        <button className="btn btn-primary">Vendedores</button>
                     </Link>
                     <Link to="/compradores">
                         <button className="btn btn-secondary">Compradores</button>
@@ -83,13 +85,25 @@ export const Navbar = () => {
                         </Link>
                     )}
 
-                     {tokenUserAdmin ? (
+                    {tokenUserAdmin ? (
                         <div className="d-flex align-items-center gap-2 ms-3">
                             <Link to="/useradmin">
-                                <button className="btn btn-outline-primary btn-sm">
-                                    Dashboard Admin
+                                <button className="btn btn-primary btn-sm">
+                                    Administrador
                                 </button>
                             </Link>
+                            <Link to="/useradmin/carrito">
+                                <button className="btn btn-dark btn-sm">
+                                    Carritos
+                                </button>
+                            </Link>
+                            <Link to="/useradmin/ordenes">
+                                <button className="btn btn-warning btn-sm">
+                                    Ordenes
+                                </button>
+                            </Link>
+                             
+
                             <span className="fw-bold text-dark">👋 {userAdminEmail}</span>
                             <button className="btn btn-outline-danger btn-sm" onClick={handleUserAdminLogout}>
                                 Cerrar sesión Admin
