@@ -604,6 +604,15 @@ def get_producto_categoria_opciones():
 
 # === API FLUJO_VENDEDOR ===
 
+@api.route('/vendedor/productos', methods=['GET'])
+@vendedor_required
+def get_mis_productos(vendedor_id):
+    """
+    Devuelve solo los productos del vendedor autenticado (por token).
+    """
+    productos = Producto.query.filter_by(vendedor_id=vendedor_id).all()
+    return jsonify([p.serialize() for p in productos]), 200
+
 @api.route('/vendedor/dashboard', methods=['GET'])
 @vendedor_required
 def get_vendedor_dashboard(vendedor_id):
