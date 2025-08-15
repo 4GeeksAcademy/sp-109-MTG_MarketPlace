@@ -23,6 +23,7 @@ import { VendedorDashboard } from "./pages/VendedorDashboard";
 import { VendedorReportes } from "./pages/VendedorReportes";
 import { VendedorOrders } from "./pages/VendedorOrders";
 import { VendedorProcesarOrden } from "./pages/VendedorProcesarOrden";
+import { VendedorPerfil } from "./pages/VendedorPerfil.jsx";
 
 // Comprador
 import { CompradorLista } from "./pages/CompradorLista";
@@ -88,6 +89,7 @@ export const router = createBrowserRouter(
       <Route path="/vendedor/reportes" element={<RutaPrivadaVendedor><VendedorReportes /> </RutaPrivadaVendedor>} />
       <Route path="/vendedor/orders" element={<RutaPrivadaVendedor><VendedorOrders /></RutaPrivadaVendedor>} />
       <Route path="/vendedor/orden/:itemId/procesar" element={<RutaPrivadaVendedor><VendedorProcesarOrden /> </RutaPrivadaVendedor>} />
+      <Route path="/vendedor/perfil" element={<RutaPrivadaVendedor> <VendedorPerfil /></RutaPrivadaVendedor>}/>
 
       <Route path="/admin/vendedores" element={<UserAdminRoute><VendedoresLista /></UserAdminRoute>} />
       <Route path="/admin/vendedores/crear" element={<UserAdminRoute><VendedorForm /></UserAdminRoute>} />

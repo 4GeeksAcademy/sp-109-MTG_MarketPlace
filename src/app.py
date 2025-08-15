@@ -17,6 +17,9 @@ static_file_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 
+app.config["UPLOAD_FOLDER"] = os.path.join(os.path.dirname(__file__), "uploads")
+os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+
 
 CORS(app)    
 
@@ -84,6 +87,11 @@ def serve_any_other_file(path):
     response = send_from_directory(static_file_dir, path)
     response.cache_control.max_age = 0
     return response
+
+@app.route('/uploads/<path:filename>')
+def serve_upload(filename):
+    upload_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'uploads')
+    return send_from_directory(upload_dir, filename)
 
 # Ejecutar servidor
 if __name__ == '__main__':

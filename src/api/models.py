@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import String, Boolean, ForeignKey, Float, Integer
+from sqlalchemy import String, Boolean, ForeignKey, Float, Integer, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from flask_admin.contrib.sqla import ModelView
 
@@ -25,9 +25,11 @@ class Vendedor(db.Model):
     __tablename__ = "vendedor"
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(120), nullable=False)
-    correo: Mapped[str] = mapped_column(
-        String(120), unique=True, nullable=False)
+    correo: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(256), nullable=False)
+    descripcion: Mapped[str] = mapped_column(Text, nullable=True)
+    imagen_url: Mapped[str] = mapped_column(String(255), nullable=True)
+
 
     productos = relationship(
         "Producto", back_populates="vendedor", cascade="all, delete")
@@ -37,6 +39,8 @@ class Vendedor(db.Model):
             "id": self.id,
             "username": self.username,
             "correo": self.correo,
+            "descripcion": self.descripcion,
+            "imagen_url": self.imagen_url,
         }
 
 

@@ -7,7 +7,7 @@ import os
 from flask import current_app as app
 from api.jwt_utils import token_required_vendedor
 from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.security import check_password_hash
+from werkzeug.utils import secure_filename
 
 
 from sqlalchemy.orm import joinedload
@@ -720,27 +720,80 @@ def guardar_direccion_envio(item_id, vendedor_id):
         db.session.rollback()
         return jsonify({"msg": "Error al procesar la orden", "error": str(e)}), 500
 
+# ====   PERFIL  ====
 
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
+@api.route('/vendedor/perfil', methods=['GET'])
+@vendedor_required
+def perfil_vendedor_get(vendedor_id):
+    vendedor = Vendedor.query.get(vendedor_id)
+    if not vendedor:
+        return jsonify({"msg": "Vendedor no encontrado"}), 404
+
+    return jsonify({
+        "id": vendedor.id,
+        "username": vendedor.username,
+        "correo": vendedor.correo,
+        "descripcion": getattr(vendedor, "descripcion", None),
+        "avatar_url": getattr(vendedor, "avatar_url", None)
+    }), 200
+
+
+@api.route('/vendedor/perfil', methods=['PUT'])
+@vendedor_required
+def perfil_vendedor_put(vendedor_id):
+    vendedor = Vendedor.query.get(vendedor_id)
+    if not vendedor:
+        return jsonify({"msg": "Vendedor no encontrado"}), 404
+
+    data = request.get_json() or {}
+    vendedor.descripcion = data.get("descripcion", getattr(vendedor, "descripcion", None))
+    vendedor.avatar_url = data.get("avatar_url", getattr(vendedor, "avatar_url", None))
+    db.session.commit()
+
+    return jsonify({"msg": "Perfil actualizado"}), 200
+
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
+
+def allowed_file(filename: str) -> bool:
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# --- subir imagen perfil ---
+@api.route('/vendedor/perfil/imagen', methods=['POST', 'OPTIONS'])
+@vendedor_required
+def subir_imagen_perfil(vendedor_id):
+    # preflight CORS (por si llega OPTIONS)
+    if request.method == 'OPTIONS':
+        return ('', 200)
+
+    if 'imagen' not in request.files:
+        return jsonify({"msg": "Falta el campo 'imagen' (multipart/form-data)"}), 400
+
+    file = request.files['imagen']
+    if file.filename == '':
+        return jsonify({"msg": "Nombre de archivo vacío"}), 400
+    if not allowed_file(file.filename):
+        return jsonify({"msg": "Extensión no permitida"}), 400
+
+    # guardar en src/uploads
+    base_dir = os.path.dirname(os.path.realpath(__file__))  # .../src/api
+    src_dir = os.path.dirname(base_dir)                      # .../src
+    upload_dir = os.path.join(src_dir, "uploads")
+    os.makedirs(upload_dir, exist_ok=True)
+
+    ext = file.filename.rsplit('.', 1)[1].lower()
+    safe_name = secure_filename(f"vend_{vendedor_id}_{int(time.time())}.{ext}")
+    file_path = os.path.join(upload_dir, safe_name)
+    file.save(file_path)
+
+    vendedor = Vendedor.query.get(vendedor_id)
+    if not vendedor:
+        return jsonify({"msg": "Vendedor no encontrado"}), 404
+
+    vendedor.avatar_url = f"/uploads/{safe_name}"
+    db.session.commit()
+
+    return jsonify({"msg": "Imagen subida", "avatar_url": vendedor.avatar_url}), 200
+          
 
 # === API ADMINISTRADOR ===
 

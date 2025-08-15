@@ -8,7 +8,7 @@ export const Navbar = () => {
     const handleLogout = () => {
         localStorage.removeItem("tokenVendedor");
         localStorage.removeItem("vendedorUsername");
-        localStorage.removeItem("vendedorId"); // por si también lo guardaste
+        localStorage.removeItem("vendedorId"); 
         navigate("/vendedor/login");
     };
 
@@ -114,6 +114,10 @@ export const Navbar = () => {
                             <button className="btn btn-outline-success btn-sm">Iniciar sesión admin</button>
                         </Link>
                     )}
+                    <Link to="/vendedor/perfil" className="btn btn-outline-light d-flex align-items-center gap-2">
+                        <i className="bi bi-person-circle" style={{ fontSize: "1.2rem" }}></i>
+                        <span>Mi Perfil</span>
+                    </Link>
                 </div>
             </div>
         </nav>
