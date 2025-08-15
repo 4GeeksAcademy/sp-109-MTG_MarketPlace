@@ -6,7 +6,7 @@ export const UserAdminRoute = ({ children }) => {
 
     if (!token) {
         // 🔽 CAMBIO: Solo pasamos la ruta (pathname), que es un string.
-        return <Navigate to="/vendedor/login" state={{ from: location.pathname }} replace />;
+        return <Navigate to="/useradmin/login" state={{ from: location.pathname }} replace />;
     }
 
     return children;
