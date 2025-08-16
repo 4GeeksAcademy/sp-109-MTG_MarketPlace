@@ -25,11 +25,11 @@ class Vendedor(db.Model):
     __tablename__ = "vendedor"
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(120), nullable=False)
-    correo: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
+    correo: Mapped[str] = mapped_column(
+        String(120), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(256), nullable=False)
     descripcion: Mapped[str] = mapped_column(Text, nullable=True)
     imagen_url: Mapped[str] = mapped_column(String(255), nullable=True)
-
 
     productos = relationship(
         "Producto", back_populates="vendedor", cascade="all, delete")
@@ -42,7 +42,6 @@ class Vendedor(db.Model):
             "descripcion": self.descripcion,
             "imagen_url": self.imagen_url,
         }
-
 
 
 class Comprador(db.Model):
@@ -83,16 +82,15 @@ class Producto(db.Model):
     nombre: Mapped[str] = mapped_column(String(120), nullable=False)
     descripcion: Mapped[str] = mapped_column(String(500))
     precio: Mapped[float] = mapped_column(Float, nullable=False)
-    vendedor_id: Mapped[int] = mapped_column(
-        ForeignKey('vendedor.id'), nullable=False)
+    imageUrl: Mapped[str] = mapped_column(String(255), nullable=True)
+    type: Mapped[str] =  mapped_column(String(500))
+    rarity: Mapped[str] = mapped_column(String(500))
+    vendedor_id: Mapped[int] = mapped_column(ForeignKey('vendedor.id'), nullable=False)
+    
 
     vendedor = relationship("Vendedor", back_populates="productos")
-
-    categorias = relationship(
-        "ProductoCategoria", back_populates="producto", cascade="all, delete")
-
-
-    items_carrito = relationship("ItemCarrito", back_populates="producto")  
+    categorias = relationship("ProductoCategoria", back_populates="producto", cascade="all, delete")
+    items_carrito = relationship("ItemCarrito", back_populates="producto")
 
     def serialize(self):
         return {
@@ -100,7 +98,10 @@ class Producto(db.Model):
             "nombre": self.nombre,
             "descripcion": self.descripcion,
             "precio": self.precio,
-            "vendedor_id": self.vendedor_id
+            "vendedor_id": self.vendedor_id,
+            "imageUrl": self.imageUrl,
+            "type": self.type,
+            "rarity": self.rarity,
         }
 
 
@@ -140,7 +141,7 @@ class ItemCarrito(db.Model):
     detalle_envio: Mapped[str] = mapped_column(String(500), nullable=True)
     latitud: Mapped[str] = mapped_column(String(50), nullable=True)
     longitud: Mapped[str] = mapped_column(String(50), nullable=True)
-    producto = relationship("Producto", back_populates="items_carrito") 
+    producto = relationship("Producto", back_populates="items_carrito")
     carrito = relationship("Carrito", back_populates="items")
 
     def serialize(self, include_carrito=True):
@@ -159,15 +160,18 @@ class ItemCarrito(db.Model):
         }
 
 
-
 class ProductoCategoria(db.Model):
     __tablename__ = "producto_categoria"
     id = db.Column(db.Integer, primary_key=True)
-    producto_id = db.Column(db.Integer, db.ForeignKey("producto.id"), nullable=False)
-    categoria_id = db.Column(db.Integer, db.ForeignKey("categorias.id"), nullable=False)
+    producto_id = db.Column(db.Integer, db.ForeignKey(
+        "producto.id"), nullable=False)
+    categoria_id = db.Column(db.Integer, db.ForeignKey(
+        "categorias.id"), nullable=False)
 
-    producto = db.relationship("Producto", backref="producto_categorias", lazy=True)
-    categoria = db.relationship("Categorias", backref="producto_categorias", lazy=True)
+    producto = db.relationship(
+        "Producto", backref="producto_categorias", lazy=True)
+    categoria = db.relationship(
+        "Categorias", backref="producto_categorias", lazy=True)
 
     def serialize(self):
         return {
@@ -178,8 +182,9 @@ class ProductoCategoria(db.Model):
             "categoria_nombre": self.categoria.name if self.categoria else None
         }
 
+
 class UserAdmin(db.Model):
-    
+
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)  # Guardar el hash
@@ -192,4 +197,3 @@ class UserAdmin(db.Model):
             "id": self.id,
             "email": self.email
         }
- 

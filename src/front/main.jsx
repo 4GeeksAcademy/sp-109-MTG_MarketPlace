@@ -8,6 +8,7 @@ import { BackendURL } from './components/BackendURL';
 import "mapbox-gl/dist/mapbox-gl.css";
 
 
+
 const Main = () => {
     
     if(! import.meta.env.VITE_BACKEND_URL ||  import.meta.env.VITE_BACKEND_URL == "") return (

@@ -71,13 +71,16 @@ def crear_producto():
 
     data = request.get_json()
 
-    if not data.get("nombre") or not data.get("precio"):
+    if not all(field in data for field in ("nombre", "precio", "rarity", "type")):
         return jsonify({"msg": "Faltan campos requeridos"}), 400
 
     producto = Producto(
         nombre=data["nombre"],
         descripcion=data.get("descripcion", ""),
         precio=data["precio"],
+        rarity=data["rarity"],
+        type=data["type"], 
+        imageUrl=data.get("imageUrl", ""), 
         vendedor_id=vendedor_id
     )
 
