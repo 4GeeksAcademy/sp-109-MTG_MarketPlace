@@ -88,11 +88,11 @@ export const router = createBrowserRouter(
       <Route path="/vendedor/orden/:itemId/procesar" element={<RutaPrivadaVendedor><VendedorProcesarOrden /></RutaPrivadaVendedor>} />
       <Route path="/vendedor/perfil" element={<RutaPrivadaVendedor><VendedorPerfil /></RutaPrivadaVendedor>} />
 
-      {/* Admin Vendedores */}
+      {/* Admin Vendedores 
       <Route path="/admin/vendedores" element={<UserAdminRoute><VendedoresLista /></UserAdminRoute>} />
       <Route path="/admin/vendedores/crear" element={<UserAdminRoute><VendedorForm /></UserAdminRoute>} />
       <Route path="/admin/vendedores/:id/detalles" element={<UserAdminRoute><VendedorDetalle /></UserAdminRoute>} />
-      <Route path="/admin/vendedores/editar/:id" element={<UserAdminRoute><VendedorForm /></UserAdminRoute>} />
+      <Route path="/admin/vendedores/editar/:id" element={<UserAdminRoute><VendedorForm /></UserAdminRoute>} />*/}
 
       {/* Productos */}
       <Route path="/productos" element={<RutaPrivadaVendedor><ProductoLista /></RutaPrivadaVendedor>} />

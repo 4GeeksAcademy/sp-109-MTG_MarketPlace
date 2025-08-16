@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const API_BASE = import.meta.env.VITE_BACKEND_URL;
-const PRIV_ENDPOINT = `${API_BASE}/api/vendedor/productos`;   // ← solo mis productos (token)
-const PROD_ENDPOINT = `${API_BASE}/api/productos`;            // ← CRUD general de productos
+const PRIV_ENDPOINT = `${API_BASE}/api/vendedor/productos`; // ← solo mis productos (token)
+const PROD_ENDPOINT = `${API_BASE}/api/productos`;          // ← CRUD general de productos
 
 export const ProductoLista = () => {
   const [productos, setProductos] = useState([]);

@@ -20,11 +20,45 @@ export const ProductoDetalle = () => {
   return (
     <div className="container mt-4">
       <h3>Detalles del Producto</h3>
-      <p><strong>Nombre:</strong> {producto.nombre}</p>
-      <p><strong>Descripción:</strong> {producto.descripcion}</p>
-      <p><strong>Precio:</strong> ${producto.precio}</p>
-      <p><strong>ID del Vendedor:</strong> {producto.vendedor_id}</p>
-      <button className="btn btn-secondary" onClick={() => navigate("/productos")}>Volver a Lista</button>
+      <hr />
+      <div className="row">
+        <div className="col-md-6">
+          {producto.imageUrl && (
+            <img
+              src={producto.imageUrl}
+              alt={producto.nombre}
+              className="img-fluid rounded mb-3"
+              onError={(e) => {
+                e.target.onerror = null; // Evita bucle infinito
+                e.target.src = "https://via.placeholder.com/300"; // Imagen de respaldo
+              }}
+            />
+          )}
+        </div>
+        <div className="col-md-6">
+          <p>
+            <strong>Nombre:</strong> {producto.nombre}
+          </p>
+          <p>
+            <strong>Descripción:</strong> {producto.descripcion}
+          </p>
+          <p>
+            <strong>Precio:</strong> ${producto.precio}
+          </p>
+          <p>
+            <strong>Rareza:</strong> {producto.rarity}
+          </p>
+          <p>
+            <strong>Tipo:</strong> {producto.type}
+          </p>
+          <p>
+            <strong>ID del Vendedor:</strong> {producto.vendedor_id}
+          </p>
+        </div>
+      </div>
+      <button className="btn btn-secondary mt-3" onClick={() => navigate("/productos")}>
+        Volver a Lista
+      </button>
     </div>
   );
 };
