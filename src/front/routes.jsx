@@ -5,6 +5,7 @@ import { Home } from "./pages/Home";
 import { Single } from "./pages/Single";
 import { Demo } from "./pages/Demo";
 
+
 // Rutas privadas
 import { RutaPrivadaVendedor } from "./components/RutaPrivadaVendedor";
 import { RutaPrivadaUserAdmin } from "./components/RutaPrivadaUserAdmin";
@@ -63,6 +64,10 @@ import { CarritoUserAdminDetalle } from "./pages/CarritoUserAdminDetalle.jsx";
 
 import { OrdenesUserAdminLista } from "./pages/OrdenesUserAdminLista";
 import { OrdenesUserAdminDetalle } from "./pages/OrdenesUserAdminDetalle";
+
+// Tienda
+import { Tienda } from "./pages/Tienda.jsx";
+import { TiendaDetalles } from "./pages/TiendaDetalles.jsx";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -148,6 +153,11 @@ export const router = createBrowserRouter(
       <Route path="/useradmin/vendedores/crear" element={<UserAdminRoute><VendedorForm /></UserAdminRoute>} />
       <Route path="/useradmin/vendedores/:id/detalles" element={<UserAdminRoute><VendedorDetalle /></UserAdminRoute>} />
       <Route path="/useradmin/vendedores/editar/:id" element={<UserAdminRoute><VendedorForm /></UserAdminRoute>} />
+
+      {/* Tienda*/}
+     <Route path="/tienda" element={<Tienda />} />
+      <Route path="/tienda/detalles/:id" element={<TiendaDetalles />} />
+
     </Route>
   )
 );

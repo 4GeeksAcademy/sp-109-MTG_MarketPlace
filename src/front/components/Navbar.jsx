@@ -42,15 +42,17 @@ export const Navbar = () => {
                         <button className="btn btn-secondary">Compradores</button>
                     </Link>
 
-
                     <Link to="/categorias">
                         <button className="btn btn-secondary">Categorias</button>
                     </Link>
 
 
-
                     <Link to="/productos">
                         <button className="btn btn-secondary">Productos</button>
+                    </Link>
+
+                    <Link to="/tienda">
+                        <button className="btn btn-secondary">Tienda</button>
                     </Link>
 
                     <Link to="/carritos">
@@ -62,7 +64,6 @@ export const Navbar = () => {
                     <Link to="/producto-categoria">
                         <button className="btn btn-secondary">Producto-Categoria</button>
                     </Link>
-
 
 
                     {tokenVendedor ? (
