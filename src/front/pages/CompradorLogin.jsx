@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 
 export const CompradorLogin = () => {
   const navigate = useNavigate();
@@ -13,7 +13,10 @@ export const CompradorLogin = () => {
   const [error, setError] = useState("");
 
   const handleChange = e => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleSubmit = async e => {
@@ -21,7 +24,7 @@ export const CompradorLogin = () => {
     setError("");
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/compradores/login`, {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/comprador/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -34,14 +37,18 @@ export const CompradorLogin = () => {
         return;
       }
 
+      // Almacenar datos del comprador
       localStorage.setItem("tokenComprador", data.token);
       localStorage.setItem("compradorUsername", data.username);
+      localStorage.setItem("compradorId", data.comprador_id);
 
-      const destino = location.state?.from?.pathname || "/compradores";
+      // Redirección después del login
+      const destino = location.state?.from?.pathname || "/comprador/dashboard";
       navigate(destino, { replace: true });
+
     } catch (err) {
+      console.error("❌ Error de conexión:", err);
       setError("Error al conectar con el servidor.");
-      console.error(err);
     }
   };
 
@@ -81,6 +88,10 @@ export const CompradorLogin = () => {
       <div className="mt-3 text-center">
         ¿No tienes cuenta?{" "}
         <Link to="/comprador/registro">Regístrate aquí</Link>
+      </div>
+      
+      <div className="mt-2 text-center">
+        <Link to="/comprador/recuperar-contrasena">¿Olvidaste tu contraseña?</Link>
       </div>
     </div>
   );
