@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-const API = import.meta.env.VITE_BACKEND_URL + "/api/compradores";
+const API = import.meta.env.VITE_BACKEND_URL + "/api/compradores"; // Cambiado el endpoint
 
-const validate = ({ username, correo }) => {
+// Función de validación adaptada para compradores
+const validate = ({ username, correo, password, direccion }, editing) => {
   const errors = {};
   if (!username.trim()) errors.username = "El nombre es obligatorio.";
   if (!correo.trim()) {
@@ -11,11 +12,24 @@ const validate = ({ username, correo }) => {
   } else if (!/@(gmail|hotmail|yahoo)\.com$/.test(correo)) {
     errors.correo = "Correo no válido. Usa @gmail, @hotmail o @yahoo.";
   }
+  if (!direccion?.trim()) errors.direccion = "La dirección es obligatoria."; // Nuevo campo
+  if (!editing) {
+    if (!password.trim()) errors.password = "La contraseña es obligatoria.";
+    else if (!/[A-Z]/.test(password) || password.length < 8) {
+      errors.password = "Mínimo 8 caracteres y una mayúscula.";
+    }
+  }
   return errors;
 };
 
 export const CompradorForm = () => {
-  const [form, setForm] = useState({ username: "", correo: "" });
+  const [form, setForm] = useState({ 
+    username: "", 
+    correo: "", 
+    password: "",
+    direccion: "" // Nuevo campo específico para compradores
+  });
+  
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   const { id } = useParams();
@@ -25,7 +39,7 @@ export const CompradorForm = () => {
     if (editing) {
       fetch(`${API}/${id}`)
         .then((res) => res.json())
-        .then((data) => setForm({ username: data.username, correo: data.correo }))
+        .then((data) => setForm({ ...data, password: "" }))
         .catch((err) => console.error("❌ Error al cargar comprador:", err));
     }
   }, [id]);
@@ -37,7 +51,7 @@ export const CompradorForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const valErrors = validate(form);
+    const valErrors = validate(form, editing);
     if (Object.keys(valErrors).length > 0) {
       setErrors(valErrors);
       return;
@@ -56,7 +70,7 @@ export const CompradorForm = () => {
         return;
       }
 
-      navigate("/compradores");
+      navigate("/compradores"); // Cambiada la ruta de redirección
     } catch (err) {
       console.error("❌ Error al enviar:", err.message);
       setErrors({ general: err.message });
@@ -94,6 +108,32 @@ export const CompradorForm = () => {
           {errors.correo && <div className="invalid-feedback d-block">{errors.correo}</div>}
         </div>
 
+        <div className="mb-3">
+          <label>Dirección</label> {/* Nuevo campo */}
+          <input
+            type="text"
+            name="direccion"
+            value={form.direccion}
+            onChange={handleChange}
+            className={`form-control ${errors.direccion ? "is-invalid" : ""}`}
+          />
+          {errors.direccion && <div className="invalid-feedback d-block">{errors.direccion}</div>}
+        </div>
+
+        <div className="mb-3">
+          <label>
+            Contraseña {editing && <small className="text-muted">(opcional)</small>}
+          </label>
+          <input
+            type="password"
+            name="password"
+            value={form.password}
+            onChange={handleChange}
+            className={`form-control ${errors.password ? "is-invalid" : ""}`}
+          />
+          {errors.password && <div className="invalid-feedback d-block">{errors.password}</div>}
+        </div>
+
         <div className="d-flex gap-2">
           <button className="btn btn-success" type="submit">
             {editing ? "Guardar cambios" : "Crear comprador"}
@@ -101,7 +141,7 @@ export const CompradorForm = () => {
           <button
             type="button"
             className="btn btn-secondary"
-            onClick={() => navigate("/compradores")}
+            onClick={() => navigate("/compradores")} // Cambiada la ruta
           >
             Cancelar
           </button>
