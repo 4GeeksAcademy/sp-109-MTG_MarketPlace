@@ -47,19 +47,21 @@ class Vendedor(db.Model):
 class Comprador(db.Model):
     __tablename__ = "comprador"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    username: Mapped[str] = mapped_column(String(120), nullable=False)
-    correo: Mapped[str] = mapped_column(
-        String(120), unique=True, nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    correo = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.Text, nullable=False)  # Hasheado
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
 
-    carritos = relationship(
-        "Carrito", back_populates="comprador", cascade="all, delete")
+    # relación con carritos (usa back_populates en lugar de backref)
+    carritos = db.relationship("Carrito", back_populates="comprador", lazy=True)
 
     def serialize(self):
         return {
             "id": self.id,
             "username": self.username,
-            "correo": self.correo
+            "correo": self.correo,
+            "created_at": self.created_at.isoformat() if self.created_at else None
         }
 
 
@@ -109,12 +111,16 @@ class Carrito(db.Model):
     __tablename__ = "carrito"
     id: Mapped[int] = mapped_column(primary_key=True)
     id_comprador: Mapped[int] = mapped_column(
-        ForeignKey("comprador.id"), nullable=False)
+        ForeignKey("comprador.id"), nullable=False
+    )
     status: Mapped[str] = mapped_column(String(20), nullable=False)
 
+    # relación inversa con Comprador
     comprador = relationship("Comprador", back_populates="carritos")
+
     items = relationship(
-        "ItemCarrito", back_populates="carrito", cascade="all, delete-orphan")
+        "ItemCarrito", back_populates="carrito", cascade="all, delete-orphan"
+    )
 
     def serialize(self, include_items=True):
         return {
@@ -122,7 +128,9 @@ class Carrito(db.Model):
             "id_comprador": self.id_comprador,
             "status": self.status,
             "comprador": self.comprador.serialize() if self.comprador else None,
-            "items": [item.serialize(include_carrito=False) for item in self.items] if include_items else []
+            "items": [
+                item.serialize(include_carrito=False) for item in self.items
+            ] if include_items else []
         }
 
 

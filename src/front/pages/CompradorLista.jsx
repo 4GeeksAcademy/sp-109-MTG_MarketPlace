@@ -186,4 +186,4 @@ export const CompradoresLista = () => {
     );
 };
 
-export default CompradorLista;
+export default CompradoresLista;

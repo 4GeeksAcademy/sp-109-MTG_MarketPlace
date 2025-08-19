@@ -14,6 +14,7 @@ from flask import current_app as app
 from api.jwt_utils import token_required_vendedor
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
+from api.jwt_utils import comprador_required
 
 
 from sqlalchemy.orm import joinedload
@@ -217,81 +218,6 @@ def delete_vendedor(id):
     db.session.delete(vendedor)
     db.session.commit()
     return jsonify({"msg": "Vendedor eliminado"}), 200
-
-# === API COMPRADORES ===
-
-
-@api.route('/compradores', methods=['GET'])
-def get_all_compradores():
-    return jsonify([c.serialize() for c in Comprador.query.all()]), 200
-
-
-@api.route('/compradores/<int:id>', methods=['GET'])
-def get_comprador(id):
-    comprador = Comprador.query.get(id)
-    if not comprador:
-        return jsonify({"msg": "Comprador no encontrado"}), 404
-    return jsonify(comprador.serialize()), 200
-
-
-@api.route('/compradores', methods=['POST'])
-def create_comprador():
-    body = request.get_json()
-    if not body:
-        return jsonify({"msg": "Body vacío"}), 400
-
-    if not all(field in body for field in ("username", "correo")):
-        return jsonify({"msg": "Faltan datos"}), 400
-
-    if Comprador.query.filter_by(username=body["username"]).first():
-        return jsonify({"msg": "Nombre de usuario ya en uso"}), 400
-    if Comprador.query.filter_by(correo=body["correo"]).first():
-        return jsonify({"msg": "Correo ya registrado"}), 400
-
-    comprador = Comprador(**body)
-    db.session.add(comprador)
-    db.session.commit()
-    return jsonify(comprador.serialize()), 201
-
-
-@api.route('/compradores/<int:id>', methods=['PUT'])
-def update_comprador(id):
-    comprador = Comprador.query.get(id)
-    if not comprador:
-        return jsonify({"msg": "Comprador no encontrado"}), 404
-
-    body = request.get_json()
-    if not body:
-        return jsonify({"msg": "Body vacío"}), 400
-
-    if "username" in body:
-        existing_user = Comprador.query.filter_by(
-            username=body["username"]).first()
-        if existing_user and existing_user.id != id:
-            return jsonify({"msg": "Nombre de usuario ya en uso"}), 400
-
-    if "correo" in body:
-        existing_email = Comprador.query.filter_by(
-            correo=body["correo"]).first()
-        if existing_email and existing_email.id != id:
-            return jsonify({"msg": "Correo ya registrado"}), 400
-
-    comprador.username = body.get("username", comprador.username)
-    comprador.correo = body.get("correo", comprador.correo)
-
-    db.session.commit()
-    return jsonify(comprador.serialize()), 200
-
-
-@api.route('/compradores/<int:id>', methods=['DELETE'])
-def delete_comprador(id):
-    comprador = Comprador.query.get(id)
-    if not comprador:
-        return jsonify({"msg": "Comprador no encontrado"}), 404
-    db.session.delete(comprador)
-    db.session.commit()
-    return jsonify({"msg": "Comprador eliminado"}), 200
-
 
 # === API CATEGORIAS ===
 
@@ -999,4 +925,136 @@ def get_itemcarrito(item_id, vendedor_id):
         "latitud": item.latitud,
         "longitud": item.longitud,
         "status": item.status
+    }), 200
+
+# === API COMPRADORES ===
+
+@api.route('/compradores', methods=['POST'])
+def create_comprador2():
+    body = request.get_json()
+    if not body:
+        return jsonify({"msg": "Body vacío"}), 400
+
+    if not all(field in body for field in ("username", "correo", "password")):
+        return jsonify({"msg": "Faltan datos"}), 400
+
+    if Comprador.query.filter_by(username=body["username"]).first():
+        return jsonify({"msg": "Nombre de usuario ya en uso"}), 400
+    if Comprador.query.filter_by(correo=body["correo"]).first():
+        return jsonify({"msg": "Correo ya registrado"}), 400
+
+    # ⚡️ Forzar hash siempre
+    comprador = Comprador(
+        username=body["username"],
+        correo=body["correo"],
+        password=generate_password_hash(body["password"], method="pbkdf2:sha256")
+    )
+
+    db.session.add(comprador)
+    db.session.commit()
+
+    print("✅ Guardado comprador:", comprador.correo, "| Contraseña (hash):", comprador.password)
+
+    return jsonify(comprador.serialize()), 201
+
+
+@api.route('/comprador/login', methods=['POST'])
+def login_comprador2():
+    correo = request.json.get("correo", None)
+    password = request.json.get("password", None)
+
+    print("📩 Datos recibidos:", correo, password)
+
+    comprador = Comprador.query.filter_by(correo=correo).first()
+    if not comprador:
+        return jsonify({"msg": "Comprador no encontrado"}), 404
+
+    print("🔑 Hash en BD:", comprador.password)
+    print("🔒 Resultado check_password_hash:",
+          check_password_hash(comprador.password, password))
+
+    if not check_password_hash(comprador.password, password):
+        return jsonify({"msg": "Credenciales incorrectas"}), 401
+
+    expiration = datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+    token = jwt.encode({
+        "comprador_id": comprador.id,
+        "correo": comprador.correo,
+        "exp": expiration
+    }, current_app.config['SECRET_KEY'], algorithm="HS256")
+
+    return jsonify({
+        "msg": "Login exitoso",
+        "token": token,
+        "comprador_id": comprador.id,
+        "username": comprador.username
+    }), 200
+
+
+@api.route('/compradores', methods=['GET'])
+def get_all_compradores2():
+    return jsonify([c.serialize() for c in Comprador.query.all()]), 200
+
+
+@api.route('/compradores/<int:id>', methods=['GET'])
+def get_comprador2(id):
+    comprador = Comprador.query.get(id)
+    if not comprador:
+        return jsonify({"msg": "Comprador no encontrado"}), 404
+    return jsonify(comprador.serialize()), 200
+
+
+@api.route('/compradores/<int:id>', methods=['PUT'])
+def update_comprador2(id):
+    comprador = Comprador.query.get(id)
+    if not comprador:
+        return jsonify({"msg": "Comprador no encontrado"}), 404
+
+    body = request.get_json()
+    if not body:
+        return jsonify({"msg": "Body vacío"}), 400
+
+    if "username" in body:
+        existing_user = Comprador.query.filter_by(username=body["username"]).first()
+        if existing_user and existing_user.id != id:
+            return jsonify({"msg": "Nombre de usuario ya en uso"}), 400
+
+    if "correo" in body:
+        existing_email = Comprador.query.filter_by(correo=body["correo"]).first()
+        if existing_email and existing_email.id != id:
+            return jsonify({"msg": "Correo ya registrado"}), 400
+
+    comprador.username = body.get("username", comprador.username)
+    comprador.correo = body.get("correo", comprador.correo)
+
+    if "password" in body and body["password"]:
+        comprador.password = generate_password_hash(body["password"])
+
+    db.session.commit()
+    return jsonify(comprador.serialize()), 200
+
+
+@api.route('/compradores/<int:id>', methods=['DELETE'])
+def delete_comprador2(id):
+    comprador = Comprador.query.get(id)
+    if not comprador:
+        return jsonify({"msg": "Comprador no encontrado"}), 404
+    db.session.delete(comprador)
+    db.session.commit()
+    return jsonify({"msg": "Comprador eliminado"}), 200
+
+
+@api.route("/comprador/dashboard", methods=["GET"])
+@comprador_required
+def comprador_dashboard(comprador_id):
+    """
+    Devuelve info básica del comprador autenticado
+    """
+    comprador = Comprador.query.get(comprador_id)
+    if not comprador:
+        return jsonify({"msg": "Comprador no encontrado"}), 404
+
+    return jsonify({
+        "msg": "Bienvenido a tu dashboard",
+        "comprador": comprador.serialize()
     }), 200
