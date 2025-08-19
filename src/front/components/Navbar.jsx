@@ -100,6 +100,23 @@ export const Navbar = () => {
                         </Link>
                     )}
 
+                    {tokenComprador ? (
+                        <div className="d-flex align-items-center gap-2 ms-3">
+                            {/* Botón de Mi Carrito */}
+                            <Link to="/mi-carrito">
+                            <button className="btn btn-warning btn-sm">
+                                Mi Carrito
+                            </button>
+                            </Link>
+                        </div>
+                        ) : (
+                        <Link to="/comprador/login" className="ms-2">
+                            <button className="btn btn-outline-success btn-sm">
+                            Iniciar sesión Comprador
+                            </button>
+                        </Link>
+                    )}
+
                     {/* ---- LOGIN VENDEDOR ---- */}
                     {tokenVendedor ? (
                         <div className="d-flex align-items-center gap-2 ms-3">

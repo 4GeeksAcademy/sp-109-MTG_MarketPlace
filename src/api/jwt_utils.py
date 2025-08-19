@@ -47,7 +47,7 @@ def comprador_required(f):
         try:
             payload = jwt.decode(
                 token,
-                current_app.config["SECRET_KEY"],
+                SECRET_KEY,  # 👈 usamos la misma que arriba
                 algorithms=["HS256"]
             )
             comprador_id = payload.get("comprador_id")

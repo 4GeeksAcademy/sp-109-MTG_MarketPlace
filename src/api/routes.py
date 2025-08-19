@@ -1068,3 +1068,42 @@ def comprador_dashboard(comprador_id):
         "msg": "Bienvenido a tu dashboard",
         "comprador": comprador.serialize()
     }), 200
+
+
+@api.route("/comprador/carrito/items", methods=["GET"])
+@comprador_required
+def get_comprador_carrito_items(comprador_id):
+    """
+    Devuelve los ítems del carrito del comprador autenticado,
+    incluyendo info del producto y el total del carrito
+    """
+    carrito = Carrito.query.filter_by(comprador_id=comprador_id).first()
+    if not carrito:
+        return jsonify({"msg": "No tienes carrito"}), 404
+
+    items = ItemCarrito.query.filter_by(carrito_id=carrito.id).all()
+
+    result = []
+    total = 0
+
+    for item in items:
+        producto = Producto.query.get(item.producto_id)
+        subtotal = producto.precio * item.cantidad
+        total += subtotal
+
+        result.append({
+            "item_id": item.id,
+            "cantidad": item.cantidad,
+            "subtotal": subtotal,
+            "producto": {
+                "id": producto.id,
+                "nombre": producto.nombre,
+                "precio": producto.precio,
+                "descripcion": producto.descripcion
+            }
+        })
+
+    return jsonify({
+        "items": result,
+        "total": total
+    }), 200

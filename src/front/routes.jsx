@@ -28,6 +28,7 @@ import { CompradorForm } from "./pages/CompradorForm";
 import { CompradorDetalle } from "./pages/CompradorDetalle";
 import { CompradorLogin } from "./pages/CompradorLogin";
 import { CompradorRegistro } from "./pages/CompradorRegistro";
+import { CompradorCarrito } from "./pages/CompradorCarrito";
 
 // Producto
 import { ProductoLista } from "./pages/ProductoLista";
@@ -122,6 +123,7 @@ export const router = createBrowserRouter(
       <Route path="/compradores/nuevo" element={<CompradorForm />} />
       <Route path="/compradores/editar/:id" element={<CompradorForm />} />
       <Route path="/compradores/:id/detalles" element={<CompradorDetalle />} />
+      <Route path="/mi-carrito" element={<CompradorCarrito />} />
 
       {/* Categorías */}
       <Route path="/categorias" element={<CategoriaLista />} />
