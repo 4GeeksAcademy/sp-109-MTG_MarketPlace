@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useCart } from "./CartContext"; // <-- importar useCart
 
 const API_BASE = import.meta.env.VITE_BACKEND_URL;
-const PRIV_ENDPOINT = `${API_BASE}/api/vendedor/productos`; // ← solo mis productos (token)
-const PROD_ENDPOINT = `${API_BASE}/api/productos`;          // ← CRUD general de productos
+const PRIV_ENDPOINT = `${API_BASE}/api/vendedor/productos`;
+const PROD_ENDPOINT = `${API_BASE}/api/productos`;
 
 export const ProductoLista = () => {
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { addToCart } = useCart(); // <-- hook de carrito
 
   const getProductos = async () => {
     setLoading(true);
@@ -60,7 +62,6 @@ export const ProductoLista = () => {
         throw new Error(msg);
       }
 
-      // recargar lista
       await getProductos();
     } catch (err) {
       console.error("❌ Error al eliminar producto:", err);
@@ -100,7 +101,7 @@ export const ProductoLista = () => {
               <th style={{ width: 80 }}>ID</th>
               <th>Nombre</th>
               <th style={{ width: 140, textAlign: "right" }}>Precio</th>
-              <th style={{ width: 260 }}>Acciones</th>
+              <th style={{ width: 320 }}>Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -123,10 +124,16 @@ export const ProductoLista = () => {
                     Editar
                   </button>
                   <button
-                    className="btn btn-danger btn-sm"
+                    className="btn btn-danger btn-sm me-2"
                     onClick={() => handleDelete(p.id)}
                   >
                     Eliminar
+                  </button>
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={() => addToCart({ id: p.id, name: p.nombre, price: Number(p.precio) })}
+                  >
+                    Añadir al carrito
                   </button>
                 </td>
               </tr>

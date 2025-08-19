@@ -37,6 +37,8 @@ import { ProductoDetalle } from "./pages/ProductoDetalle";
 import { CarritoLista } from "./pages/CarritoLista";
 import { CarritoForm } from "./pages/CarritoForm";
 import { CarritoDetalles } from "./pages/CarritoDetalle";
+import Checkout from "./pages/Checkout.jsx";
+import  Receipt  from "./pages/Receipt";
 
 // Ítem Carrito
 import { ItemCarritoLista } from "./pages/ItemCarritoLista";
@@ -134,7 +136,8 @@ export const router = createBrowserRouter(
       <Route path="/itemcarrito/nuevo" element={<ItemCarritoForm />} />
       <Route path="/itemcarrito/editar/:id" element={<ItemCarritoForm />} />
       <Route path="/itemcarrito/detalles/:id" element={<ItemCarritoDetalle />} />
-
+      <Route path="/checkout/:id" element={<Checkout />} />
+      <Route path="/receipt" element={<Receipt />} />
       {/* Producto-Categorías */}
       <Route path="/producto-categoria" element={<ProductoCategoriaLista />} />
       <Route path="/producto-categoria/nuevo" element={<ProductoCategoriaForm />} />

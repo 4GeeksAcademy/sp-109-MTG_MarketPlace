@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const API = import.meta.env.VITE_BACKEND_URL + "/api/carritos";
 
 export const CarritoLista = () => {
   const [carritos, setCarritos] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch(API)
@@ -28,6 +29,10 @@ export const CarritoLista = () => {
       console.error("❌ Error al eliminar carrito:", err);
       alert("No se pudo eliminar el carrito.");
     }
+  };
+
+  const handleCheckout = (id) => {
+    navigate(`/checkout/${id}`);
   };
 
   return (
@@ -62,6 +67,7 @@ export const CarritoLista = () => {
                 <Link to={`/carritos/detalles/${carrito.id}`} className="btn btn-info btn-sm mx-1">Detalles</Link>
                 <Link to={`/carritos/editar/${carrito.id}`} className="btn btn-warning btn-sm mx-1">Editar</Link>
                 <button onClick={() => handleDelete(carrito.id)} className="btn btn-danger btn-sm mx-1">Eliminar</button>
+                <button onClick={() => handleCheckout(carrito.id)} className="btn btn-success btn-sm mx-1">Checkout</button>
               </td>
             </tr>
           ))}
