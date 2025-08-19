@@ -25,7 +25,7 @@ app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "clave_super_secreta_cambiala
 # CORS
 FRONT_ORIGIN = os.getenv(
     "FRONT_ORIGIN",
-    "https://effective-spork-g46xgp4qrjgv3rwq-3000.app.github.dev",
+    "https://reimagined-waffle-pj97x6jr9rqqhrx47-3000.app.github.dev",
 )
 CORS(
     app,

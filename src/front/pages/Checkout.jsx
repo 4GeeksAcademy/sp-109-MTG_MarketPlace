@@ -3,7 +3,7 @@ import { useCart } from "./CartContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCcVisa, faCcMastercard, faCcAmex } from "@fortawesome/free-brands-svg-icons";
 
-export default function Checkout({ onComplete }) {
+export const Checkout = ({ onComplete }) => {
   const { cart, clearCart } = useCart();
   const [paymentMethod, setPaymentMethod] = useState(null);
   const [cardType, setCardType] = useState(null);

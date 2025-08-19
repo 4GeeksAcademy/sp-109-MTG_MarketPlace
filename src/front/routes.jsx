@@ -37,7 +37,7 @@ import { ProductoDetalle } from "./pages/ProductoDetalle";
 import { CarritoLista } from "./pages/CarritoLista";
 import { CarritoForm } from "./pages/CarritoForm";
 import { CarritoDetalles } from "./pages/CarritoDetalle";
-import Checkout from "./pages/Checkout.jsx";
+import {Checkout} from "./pages/Checkout.jsx";
 import  Receipt  from "./pages/Receipt";
 
 // Ítem Carrito
