@@ -5,7 +5,6 @@ import { Home } from "./pages/Home";
 import { Single } from "./pages/Single";
 import { Demo } from "./pages/Demo";
 
-
 // Rutas privadas
 import { RutaPrivadaVendedor } from "./components/RutaPrivadaVendedor";
 import { RutaPrivadaUserAdmin } from "./components/RutaPrivadaUserAdmin";
@@ -23,9 +22,11 @@ import { VendedorProcesarOrden } from "./pages/VendedorProcesarOrden";
 import VendedorPerfil from "./pages/VendedorPerfil.jsx";
 
 // Comprador
-import { CompradorLista } from "./pages/CompradorLista";
+import  CompradoresLista  from "./pages/CompradorLista";
 import { CompradorForm } from "./pages/CompradorForm";
 import { CompradorDetalle } from "./pages/CompradorDetalle";
+import { CompradorLogin } from "./pages/CompradorLogin";
+import { CompradorRegistro } from "./pages/CompradorRegistro";
 
 // Producto
 import { ProductoLista } from "./pages/ProductoLista";
@@ -65,10 +66,6 @@ import { CarritoUserAdminDetalle } from "./pages/CarritoUserAdminDetalle.jsx";
 import { OrdenesUserAdminLista } from "./pages/OrdenesUserAdminLista";
 import { OrdenesUserAdminDetalle } from "./pages/OrdenesUserAdminDetalle";
 
-// Tienda
-import { Tienda } from "./pages/Tienda.jsx";
-import { TiendaDetalles } from "./pages/TiendaDetalles.jsx";
-
 export const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<Layout />} errorElement={<h1>Not found!</h1>}>
@@ -105,8 +102,13 @@ export const router = createBrowserRouter(
       <Route path="/productos/editar/:id" element={<RutaPrivadaVendedor><ProductoForm /></RutaPrivadaVendedor>} />
       <Route path="/productos/detalles/:id" element={<RutaPrivadaVendedor><ProductoDetalle /></RutaPrivadaVendedor>} />
 
+
+      {/* Autenticación Comprador */}
+      <Route path="/comprador/login" element={<CompradorLogin />} />
+      <Route path="/comprador/registro" element={<CompradorRegistro />} />
+
       {/* Compradores */}
-      <Route path="/compradores" element={<CompradorLista />} />
+      <Route path="/compradores" element={<CompradoresLista />} />
       <Route path="/compradores/nuevo" element={<CompradorForm />} />
       <Route path="/compradores/editar/:id" element={<CompradorForm />} />
       <Route path="/compradores/:id/detalles" element={<CompradorDetalle />} />
@@ -153,11 +155,6 @@ export const router = createBrowserRouter(
       <Route path="/useradmin/vendedores/crear" element={<UserAdminRoute><VendedorForm /></UserAdminRoute>} />
       <Route path="/useradmin/vendedores/:id/detalles" element={<UserAdminRoute><VendedorDetalle /></UserAdminRoute>} />
       <Route path="/useradmin/vendedores/editar/:id" element={<UserAdminRoute><VendedorForm /></UserAdminRoute>} />
-
-      {/* Tienda*/}
-     <Route path="/tienda" element={<Tienda />} />
-      <Route path="/tienda/detalles/:id" element={<TiendaDetalles />} />
-
     </Route>
   )
 );

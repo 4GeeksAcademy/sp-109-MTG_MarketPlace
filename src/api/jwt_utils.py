@@ -32,3 +32,34 @@ def token_required_vendedor(f):
 
         return f(*args, **kwargs)
     return decorated
+
+
+def comprador_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        auth_header = request.headers.get("Authorization")
+
+        if not auth_header or not auth_header.startswith("Bearer "):
+            return jsonify({"msg": "Token requerido"}), 401
+
+        token = auth_header.split(" ")[1]
+
+        try:
+            payload = jwt.decode(
+                token,
+                current_app.config["SECRET_KEY"],
+                algorithms=["HS256"]
+            )
+            comprador_id = payload.get("comprador_id")
+            if not comprador_id:
+                return jsonify({"msg": "Token inválido (falta comprador_id)"}), 401
+
+        except jwt.ExpiredSignatureError:
+            return jsonify({"msg": "Token expirado"}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({"msg": "Token inválido"}), 401
+
+        # Pasamos el comprador_id a la función
+        return f(comprador_id=comprador_id, *args, **kwargs)
+
+    return decorated_function
