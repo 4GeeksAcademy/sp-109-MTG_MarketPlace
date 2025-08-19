@@ -81,7 +81,7 @@ export const TiendaDetalles = () => {
               {/* 🟢 Botón que siempre navega a /compradores/login 🟢 */}
               <button
                 className="btn btn-success"
-                onClick={() =>navigate("/compradores/login")}
+                onClick={() =>navigate("/comprador/login")}
               >
                 Comprar
               </button>

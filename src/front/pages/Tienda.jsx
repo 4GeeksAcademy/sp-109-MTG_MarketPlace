@@ -1,37 +1,40 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-const API_BASE = import.meta.env.VITE_BACKEND_URL;
-const PROD_ENDPOINT = `${API_BASE}/api/productos`;
+const API_ENDPOINT = import.meta.env.VITE_BACKEND_URL + "/api/productos";
 
 export const Tienda = () => {
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchProductos = async () => {
-      setLoading(true);
-      try {
-        const res = await fetch(PROD_ENDPOINT);
-        if (!res.ok) throw new Error(`Error ${res.status}`);
-        const data = await res.json();
+  const fetchProductos = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(API_ENDPOINT);
+      if (!res.ok) throw new Error(`Error ${res.status}`);
+      const data = await res.json();
 
-        const productosMapeados = data.map((p) => ({
+      // Validar datos que realmente existen en la tabla productos
+      const productosValidos = (Array.isArray(data) ? data : [])
+        .filter((p) => p.id && p.nombre) // solo productos con ID y nombre
+        .map((p) => ({
           id: p.id,
           nombre: p.nombre,
           detalle: p.descripcion || "Sin descripción",
+          precio: p.precio || 0,
           imagen: p.imageUrl || "https://placehold.co/400x300?text=Sin+imagen",
         }));
 
-        setProductos(productosMapeados);
-      } catch (err) {
-        console.error("❌ Error al cargar productos:", err);
-        setProductos([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+      setProductos(productosValidos);
+    } catch (err) {
+      console.error("❌ Error al cargar productos:", err);
+      setProductos([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchProductos();
   }, []);
 
@@ -51,7 +54,12 @@ export const Tienda = () => {
                 src={producto.imagen}
                 className="card-img-top"
                 alt={producto.nombre}
-                style={{ objectFit: "contain", height: "200px", width: "100%", backgroundColor: "#f8f9fa" }}
+                style={{
+                  objectFit: "contain",
+                  height: "200px",
+                  width: "100%",
+                  backgroundColor: "#f8f9fa",
+                }}
                 onError={(e) => {
                   e.target.onerror = null;
                   e.target.src = "https://placehold.co/400x300?text=Sin+imagen";
@@ -60,11 +68,12 @@ export const Tienda = () => {
               <div className="card-body d-flex flex-column">
                 <h5 className="card-title">{producto.nombre}</h5>
                 <p className="card-text">{producto.detalle}</p>
+                <p className="fw-bold">${producto.precio}</p>
                 <Link
                   to={`/tienda/detalles/${producto.id}`}
                   className="btn btn-primary mt-auto"
                 >
-                  Ver
+                  Ver más
                 </Link>
               </div>
             </div>
@@ -74,3 +83,4 @@ export const Tienda = () => {
     </div>
   );
 };
+

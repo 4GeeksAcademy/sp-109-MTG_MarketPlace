@@ -17,7 +17,7 @@ const AVATAR_PLACEHOLDER =
     </svg>`
   );
 
-export default function VendedorPerfil() {
+export const VendedorPerfil =() =>{
   const API = import.meta.env.VITE_BACKEND_URL;
   const token = useMemo(() => localStorage.getItem("tokenVendedor"), []);
   const authHeader = useMemo(

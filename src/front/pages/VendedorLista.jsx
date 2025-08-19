@@ -143,7 +143,7 @@ export const VendedoresLista = () => {
                                     <td className="py-3 px-4 flex justify-center space-x-2">
                                         <button
                                             className="btn btn-info btn-sm me-2"
-                                            onClick={() => handleNavigate('/detalles/:id', v.id)}
+                                            onClick={() => handleNavigate('/:id/detalles', v.id)}
                                         >
                                             Ver Detalles
                                         </button>

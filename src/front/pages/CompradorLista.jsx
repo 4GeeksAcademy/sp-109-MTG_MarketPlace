@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 const API = import.meta.env.VITE_BACKEND_URL + "/api/compradores"; // Cambiado el endpoint
 
-export const CompradoresLista = () => {
+export const CompradorLista = () => {
     // Estado para almacenar la lista de compradores
     const [compradores, setCompradores] = useState([]);
     // Estado para verificar si el usuario es un administrador
@@ -186,4 +186,4 @@ export const CompradoresLista = () => {
     );
 };
 
-export default CompradoresLista;
+export default CompradorLista;
