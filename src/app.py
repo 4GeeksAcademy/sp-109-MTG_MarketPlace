@@ -25,7 +25,8 @@ app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "clave_super_secreta_cambiala
 # CORS
 FRONT_ORIGIN = os.getenv(
     "FRONT_ORIGIN",
-    "https://crispy-fortnight-wr6ww59w9qvcqvw-3000.app.github.dev",
+    "https://obscure-rotary-phone-4j6j5xx96499f5qxj-3000.app.github.dev",
+
 )
 CORS(
     app,

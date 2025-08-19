@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 24b01cfb0c1b
+Revision ID: fafe4aefd123
 Revises: 
-Create Date: 2025-08-08 02:03:16.734453
+Create Date: 2025-08-18 17:09:12.494608
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '24b01cfb0c1b'
+revision = 'fafe4aefd123'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -38,11 +38,20 @@ def upgrade():
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email')
     )
+    op.create_table('user_admin',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('email', sa.String(length=120), nullable=False),
+    sa.Column('password', sa.String(length=200), nullable=False),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('email')
+    )
     op.create_table('vendedor',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('username', sa.String(length=120), nullable=False),
     sa.Column('correo', sa.String(length=120), nullable=False),
     sa.Column('password', sa.String(length=256), nullable=False),
+    sa.Column('descripcion', sa.Text(), nullable=True),
+    sa.Column('imagen_url', sa.String(length=255), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('correo')
     )
@@ -58,6 +67,9 @@ def upgrade():
     sa.Column('nombre', sa.String(length=120), nullable=False),
     sa.Column('descripcion', sa.String(length=500), nullable=False),
     sa.Column('precio', sa.Float(), nullable=False),
+    sa.Column('imageUrl', sa.String(length=255), nullable=True),
+    sa.Column('type', sa.String(length=500), nullable=False),
+    sa.Column('rarity', sa.String(length=500), nullable=False),
     sa.Column('vendedor_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['vendedor_id'], ['vendedor.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -94,6 +106,7 @@ def downgrade():
     op.drop_table('producto')
     op.drop_table('carrito')
     op.drop_table('vendedor')
+    op.drop_table('user_admin')
     op.drop_table('user')
     op.drop_table('comprador')
     op.drop_table('categorias')
