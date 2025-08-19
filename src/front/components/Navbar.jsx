@@ -72,6 +72,7 @@ export const Navbar = () => {
                     <Link to="/itemcarrito">
                         <button className="btn btn-secondary">Ítems Carrito</button>
                     </Link>
+                    
                     <Link to="/producto-categoria">
                         <button className="btn btn-secondary">Producto-Categoria</button>
                     </Link>
