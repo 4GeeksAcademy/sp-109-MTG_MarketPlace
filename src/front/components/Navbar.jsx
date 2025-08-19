@@ -10,7 +10,7 @@ export const Navbar = () => {
     const handleLogoutVendedor = () => {
         localStorage.removeItem("tokenVendedor");
         localStorage.removeItem("vendedorUsername");
-        localStorage.removeItem("vendedorId"); 
+        localStorage.removeItem("vendedorId");
         navigate("/vendedor/login");
     };
 
@@ -66,6 +66,10 @@ export const Navbar = () => {
                     <Link to="/tienda">
                         <button className="btn btn-secondary">Tienda</button>
                     </Link>
+                    <Link to="/tienda/vendedores">
+                     <button className="btn btn-secondary">Tienda Vendedores</button>
+                    </Link>
+
                     <Link to="/carritos">
                         <button className="btn btn-secondary">Carritos</button>
                     </Link>
