@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const CompradorCarrito = () => {
   const [carrito, setCarrito] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
- 
+  const navigate = useNavigate();
+
   const toAbsoluteUrl = (src) => {
     if (!src) return null;
     if (src.startsWith("http://") || src.startsWith("https://")) return src;
@@ -49,13 +51,10 @@ export const CompradorCarrito = () => {
           }
         );
 
-       
         let data = null;
         try {
           data = await res.json();
-        } catch {
-         
-        }
+        } catch {}
 
         if (!res.ok) {
           setError((data && (data.msg || data.error)) || "Error al obtener el carrito");
@@ -63,11 +62,13 @@ export const CompradorCarrito = () => {
           return;
         }
 
-     
         const items = Array.isArray(data?.items) ? data.items : [];
         const total = Number(data?.total || 0);
 
-        setCarrito({ items, total });
+        // Creamos un ID temporal si no viene
+        const carritoId = data?.id || Date.now();
+
+        setCarrito({ id: carritoId, items, total });
       } catch (err) {
         if (err.name !== "AbortError") {
           console.error("❌ Error al obtener el carrito:", err);
@@ -82,6 +83,11 @@ export const CompradorCarrito = () => {
     return () => controller.abort();
   }, []);
 
+  const handleContinuar = () => {
+    if (!carrito) return;
+    navigate(`/checkout/${carrito.id}`, { state: { carrito } });
+  };
+
   if (loading) return <p>Cargando carrito...</p>;
   if (error) return <div className="alert alert-danger">{error}</div>;
   if (!carrito || carrito.items.length === 0)
@@ -95,23 +101,42 @@ export const CompradorCarrito = () => {
         const prod = item?.producto || {};
         const img = getProductoImage(prod);
         return (
-          <div key={item.item_id || `${prod.id}-${item.cantidad}`} className="card mb-2 p-3 shadow-sm">
+          <div
+            key={item.item_id || `${prod.id}-${item.cantidad}`}
+            className="card mb-2 p-3 shadow-sm"
+          >
             <div className="d-flex gap-3 align-items-start">
               <img
                 src={img}
                 alt={prod?.nombre || "Producto"}
-                style={{ width: 120, height: 120, objectFit: "contain", borderRadius: 8, background: "#f8f9fa" }}
+                style={{
+                  width: 120,
+                  height: 120,
+                  objectFit: "contain",
+                  borderRadius: 8,
+                  background: "#f8f9fa",
+                }}
                 onError={(e) => {
-                  e.currentTarget.src = "https://placehold.co/400x300?text=Sin+imagen";
+                  e.currentTarget.src =
+                    "https://placehold.co/400x300?text=Sin+imagen";
                 }}
               />
               <div className="flex-grow-1">
                 <h5 className="mb-1">{prod?.nombre || "Producto sin nombre"}</h5>
-                {prod?.descripcion && <p className="mb-2 text-muted">{prod.descripcion}</p>}
+                {prod?.descripcion && (
+                  <p className="mb-2 text-muted">{prod.descripcion}</p>
+                )}
                 <div className="d-flex flex-wrap gap-3">
-                  <span>Precio: <strong>{formatMoney(prod?.precio)}</strong></span>
-                  <span>Cantidad: <strong>{item?.cantidad}</strong></span>
-                  <span>Subtotal: <strong>{formatMoney(item?.subtotal)}</strong></span>
+                  <span>
+                    Precio: <strong>{formatMoney(prod?.precio)}</strong>
+                  </span>
+                  <span>
+                    Cantidad: <strong>{item?.cantidad}</strong>
+                  </span>
+                  <span>
+                    Subtotal:{" "}
+                    <strong>{formatMoney((prod?.precio || 0) * item?.cantidad)}</strong>
+                  </span>
                 </div>
               </div>
             </div>
@@ -121,7 +146,9 @@ export const CompradorCarrito = () => {
 
       <div className="text-end mt-3">
         <h4>Total: {formatMoney(carrito.total)}</h4>
-        <button className="btn btn-primary">Continuar</button>
+        <button className="btn btn-primary" onClick={handleContinuar}>
+          Continuar
+        </button>
       </div>
     </div>
   );

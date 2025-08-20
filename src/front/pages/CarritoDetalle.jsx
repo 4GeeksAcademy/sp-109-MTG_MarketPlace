@@ -5,6 +5,7 @@ export const CarritoDetalles = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [carrito, setCarrito] = useState(null);
+
   const API = import.meta.env.VITE_BACKEND_URL + `/api/carritos/${id}`;
 
   useEffect(() => {
@@ -27,6 +28,11 @@ export const CarritoDetalles = () => {
       const precio = item.producto?.precio || 0;
       return total + item.cantidad * precio;
     }, 0);
+  };
+
+  const handleCheckout = () => {
+    // Navegación absoluta hacia checkout con el ID del carrito
+    navigate(`/checkout/${carrito.id}`);
   };
 
   return (
@@ -81,12 +87,23 @@ export const CarritoDetalles = () => {
           <div className="text-end fw-bold fs-5">
             Total: ${calcularTotal().toFixed(2)}
           </div>
+
+          <div className="mt-3 d-flex gap-2">
+            <button
+              className="btn btn-primary"
+              onClick={handleCheckout}
+            >
+              Continuar al Checkout
+            </button>
+            <button
+              className="btn btn-secondary"
+              onClick={() => navigate("/carritos")}
+            >
+              Volver a la lista
+            </button>
+          </div>
         </>
       )}
-
-      <button className="btn btn-secondary mt-3" onClick={() => navigate("/carritos")}>
-        Volver a la lista
-      </button>
     </div>
   );
 };

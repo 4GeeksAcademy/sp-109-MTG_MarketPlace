@@ -33,8 +33,8 @@ FRONT_ORIGIN = os.getenv(
 CORS(
     app,
     resources={
-        r"/api/*": {"origins": FRONT_ORIGINS},
-        r"/uploads/*": {"origins": FRONT_ORIGINS},
+        r"/api/*": {"origins": FRONT_ORIGIN},
+        r"/uploads/*": {"origins": FRONT_ORIGIN},
     },
     supports_credentials=True,                 # si usas cookies/sesión/JWT en cookie
     expose_headers=["Content-Type", "Authorization"],
@@ -46,7 +46,7 @@ CORS(
 @app.after_request
 def add_cors_headers(resp):
     origin = request.headers.get("Origin")
-    if origin and (FRONT_ORIGINS == "*" or origin == FRONT_ORIGINS):
+    if origin and (FRONT_ORIGIN == "*" or origin == FRONT_ORIGIN):
         resp.headers["Access-Control-Allow-Origin"] = origin
         resp.headers["Vary"] = "Origin"
         resp.headers["Access-Control-Allow-Credentials"] = "true"
