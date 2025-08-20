@@ -54,9 +54,11 @@
 		]
 	},
 	"dependencies": {
+
 		"@fortawesome/free-brands-svg-icons": "^7.0.0",
 		"@fortawesome/free-solid-svg-icons": "^7.0.0",
 		"@fortawesome/react-fontawesome": "^0.2.5",
+
 		"@mapbox/mapbox-sdk": "^0.16.1",
 		"@mapbox/search-js-core": "^1.3.0",
 		"leaflet": "^1.9.4",
