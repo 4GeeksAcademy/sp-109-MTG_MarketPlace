@@ -23,24 +23,29 @@ app.url_map.strict_slashes = False
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "clave_super_secreta_cambiala")
 
 # CORS
-FRONT_ORIGIN = os.getenv(
-    "FRONT_ORIGIN",
-    "https://studious-space-pancake-q76vwx7q4rwxh9wg4-3000.app.github.dev",
-)
+FRONT_ORIGINS = [
+    "https://obscure-rotary-phone-4j6j5xx96499f5qxj-3000.app.github.dev",
+    "https://obscure-rotary-phone-4j6j5xx96499f5qxj-3001.app.github.dev",
+]
+
+
 CORS(
     app,
-    supports_credentials=True,
     resources={
-        r"/api/*": {"origins": FRONT_ORIGIN},
-        r"/uploads/*": {"origins": FRONT_ORIGIN},
+        r"/api/*": {"origins": FRONT_ORIGINS},
+        r"/uploads/*": {"origins": FRONT_ORIGINS},
     },
+    supports_credentials=True,                 # si usas cookies/sesión/JWT en cookie
     expose_headers=["Content-Type", "Authorization"],
+    allow_headers=["Content-Type", "Authorization"],
+    methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    intercept_exceptions=True,                 # <-- añade CORS también en 4xx/5xx
 )
 
 @app.after_request
 def add_cors_headers(resp):
     origin = request.headers.get("Origin")
-    if origin and (FRONT_ORIGIN == "*" or origin == FRONT_ORIGIN):
+    if origin and (FRONT_ORIGINS == "*" or origin == FRONT_ORIGINS):
         resp.headers["Access-Control-Allow-Origin"] = origin
         resp.headers["Vary"] = "Origin"
         resp.headers["Access-Control-Allow-Credentials"] = "true"
