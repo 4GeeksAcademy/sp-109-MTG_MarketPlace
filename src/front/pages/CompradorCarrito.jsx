@@ -83,10 +83,13 @@ export const CompradorCarrito = () => {
     return () => controller.abort();
   }, []);
 
-  const handleContinuar = () => {
-    if (!carrito) return;
-    navigate(`/checkout/${carrito.id}`, { state: { carrito } });
-  };
+const handleContinuar = () => {
+  if (!carrito || carrito.items.length === 0) {
+    alert("Tu carrito está vacío.");
+    return;
+  }
+  navigate("/comprador/ordenes/procesar", { state: { carrito } });
+};
 
   if (loading) return <p>Cargando carrito...</p>;
   if (error) return <div className="alert alert-danger">{error}</div>;
@@ -146,9 +149,9 @@ export const CompradorCarrito = () => {
 
       <div className="text-end mt-3">
         <h4>Total: {formatMoney(carrito.total)}</h4>
-        <button className="btn btn-primary" onClick={handleContinuar}>
-          Continuar
-        </button>
+          <button className="btn btn-primary" onClick={handleContinuar}>
+            Continuar
+          </button>
       </div>
     </div>
   );

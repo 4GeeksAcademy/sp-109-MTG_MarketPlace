@@ -1110,3 +1110,75 @@ def get_comprador_carrito_items(comprador_id):
         })
 
     return jsonify({"items": result, "total": total}), 200
+
+
+    
+# === API FLUJO_COMPRADOR: Dirección de envío ===
+
+@api.route('/comprador/orden/<int:item_id>/direccion', methods=['POST'])
+@comprador_required
+def comprador_guardar_direccion(item_id, comprador_id):
+    """
+    Guarda la dirección de envío de un ítem del carrito, validando que el comprador
+    autenticado sea dueño de ese carrito.
+    """
+    item = ItemCarrito.query.get(item_id)
+
+    if not item:
+        return jsonify({"msg": "Ítem no encontrado"}), 404
+
+    # Verifica que el carrito pertenece al comprador autenticado
+    if not item.carrito or item.carrito.id_comprador != comprador_id:
+        return jsonify({"msg": "No autorizado para modificar este ítem"}), 403
+
+    data = request.get_json()
+    direccion = data.get("direccion")
+    detalle = data.get("detalle")
+    latitud = data.get("latitud")
+    longitud = data.get("longitud")
+
+    if not direccion:
+        return jsonify({"msg": "La dirección es obligatoria"}), 400
+
+    try:
+        item.direccion_envio = direccion
+        item.detalle_envio = detalle
+        item.latitud = latitud
+        item.longitud = longitud
+        item.status = "get_direction"  # estado inicial del comprador
+
+        db.session.commit()
+        return jsonify({"msg": "Dirección guardada correctamente"}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        print("❌ Error guardando dirección del comprador:", repr(e))
+        return jsonify({"msg": "Error al guardar dirección", "error": str(e)}), 500
+    
+
+# === API FLUJO_COMPRADOR: Obtener dirección de envío ===
+
+@api.route('/comprador/orden/<int:item_id>/direccion', methods=['GET'])
+@comprador_required
+def comprador_get_direccion(item_id, comprador_id):
+    """
+    Devuelve la dirección de envío guardada para un ítem del carrito,
+    validando que el comprador autenticado sea dueño de ese carrito.
+    """
+    item = ItemCarrito.query.get(item_id)
+
+    if not item:
+        return jsonify({"msg": "Ítem no encontrado"}), 404
+
+    # Verifica que el carrito pertenece al comprador autenticado
+    if not item.carrito or item.carrito.id_comprador != comprador_id:
+        return jsonify({"msg": "No autorizado para ver este ítem"}), 403
+
+    return jsonify({
+        "item_id": item.id,
+        "direccion": item.direccion_envio,
+        "detalle": item.detalle_envio,
+        "latitud": item.latitud,
+        "longitud": item.longitud,
+        "status": item.status
+    }), 200

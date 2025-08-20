@@ -1,4 +1,4 @@
-import { createBrowserRouter, createRoutesFromElements, Route } from "react-router-dom";
+import { createBrowserRouter, createRoutesFromElements, Route, Navigate } from "react-router-dom";
 
 import { Layout } from "./pages/Layout";
 import { Home } from "./pages/Home";
@@ -29,6 +29,8 @@ import { CompradorDetalle } from "./pages/CompradorDetalle";
 import { CompradorLogin } from "./pages/CompradorLogin";
 import { CompradorRegistro } from "./pages/CompradorRegistro";
 import { CompradorCarrito } from "./pages/CompradorCarrito";
+import { CompradorProcesarOrden } from "./pages/CompradorProcesarOrden";
+
 
 // Producto
 import { ProductoLista } from "./pages/ProductoLista";
@@ -41,7 +43,6 @@ import { CarritoForm } from "./pages/CarritoForm";
 import { CarritoDetalles } from "./pages/CarritoDetalle";
 import { Checkout } from "./pages/Checkout.jsx";
 import Receipt from "./pages/Receipt";
-import { EstadoPedido } from "./pages/EstadoPedido";
 
 // Ítem Carrito
 import { ItemCarritoLista } from "./pages/ItemCarritoLista";
@@ -102,18 +103,11 @@ export const router = createBrowserRouter(
       <Route path="/vendedor/orden/:itemId/procesar" element={<RutaPrivadaVendedor><VendedorProcesarOrden /></RutaPrivadaVendedor>} />
       <Route path="/vendedor/perfil" element={<RutaPrivadaVendedor><VendedorPerfil /></RutaPrivadaVendedor>} />
 
-      {/* Admin Vendedores 
-      <Route path="/admin/vendedores" element={<UserAdminRoute><VendedoresLista /></UserAdminRoute>} />
-      <Route path="/admin/vendedores/crear" element={<UserAdminRoute><VendedorForm /></UserAdminRoute>} />
-      <Route path="/admin/vendedores/:id/detalles" element={<UserAdminRoute><VendedorDetalle /></UserAdminRoute>} />
-      <Route path="/admin/vendedores/editar/:id" element={<UserAdminRoute><VendedorForm /></UserAdminRoute>} />*/}
-
       {/* Productos */}
       <Route path="/productos" element={<RutaPrivadaProducto><ProductoLista /></RutaPrivadaProducto>} />
       <Route path="/productos/nuevo" element={<RutaPrivadaProducto><ProductoForm /></RutaPrivadaProducto>} />
       <Route path="/productos/editar/:id" element={<RutaPrivadaProducto><ProductoForm /></RutaPrivadaProducto>} />
       <Route path="/productos/detalles/:id" element={<RutaPrivadaVendedor><ProductoDetalle /></RutaPrivadaVendedor>} />
-
 
       {/* Autenticación Comprador */}
       <Route path="/comprador/login" element={<CompradorLogin />} />
@@ -124,7 +118,12 @@ export const router = createBrowserRouter(
       <Route path="/compradores/nuevo" element={<CompradorForm />} />
       <Route path="/compradores/editar/:id" element={<CompradorForm />} />
       <Route path="/compradores/:id/detalles" element={<CompradorDetalle />} />
+
+      {/* Carrito Comprador */}
       <Route path="/mi-carrito" element={<CompradorCarrito />} />
+      <Route path="/comprador/carrito" element={<Navigate to="/mi-carrito" replace />} />
+      <Route path="/comprador/orden/:itemId/procesar" element={<CompradorProcesarOrden />} />
+      <Route path="/comprador/ordenes/procesar" element={<CompradorProcesarOrden />} />
 
       {/* Categorías */}
       <Route path="/categorias" element={<CategoriaLista />} />
@@ -137,15 +136,17 @@ export const router = createBrowserRouter(
       <Route path="/carritos/nuevo" element={<CarritoForm />} />
       <Route path="/carritos/editar/:id" element={<CarritoForm />} />
       <Route path="/carritos/detalles/:id" element={<CarritoDetalles />} />
-      
+
       {/* Ítems Carrito */}
       <Route path="/itemcarrito" element={<ItemCarritoLista />} />
       <Route path="/itemcarrito/nuevo" element={<ItemCarritoForm />} />
       <Route path="/itemcarrito/editar/:id" element={<ItemCarritoForm />} />
       <Route path="/itemcarrito/detalles/:id" element={<ItemCarritoDetalle />} />
+
+      {/* Checkout & Receipt */}
       <Route path="/checkout/:id" element={<Checkout />} />
       <Route path="/receipt" element={<Receipt />} />
-      
+
       {/* Producto-Categorías */}
       <Route path="/producto-categoria" element={<ProductoCategoriaLista />} />
       <Route path="/producto-categoria/nuevo" element={<ProductoCategoriaForm />} />
@@ -174,10 +175,8 @@ export const router = createBrowserRouter(
       {/* Tiendas */}
       <Route path="/tienda" element={<Tienda />} />
       <Route path="/tienda/detalles/:id" element={<TiendaDetalles />} />
-
       <Route path="/tienda/vendedores" element={<TiendaVendedores />} />
       <Route path="/tienda/vendedores/:vendedorId" element={<TiendaVendedoresCartas />} />
-
     </Route>
   )
 );

@@ -168,9 +168,9 @@ export const Navbar = () => {
                     )}
 
                     {/* ---- PERFIL ---- */}
-                    <Link
+                     <Link
                         to="/vendedor/perfil"
-                        className="btn btn-outline-light d-flex align-items-center gap-2"
+                        className="btn btn-outline-dark d-flex align-items-center gap-2"
                     >
                         <i className="bi bi-person-circle" style={{ fontSize: "1.2rem" }}></i>
                         <span>Mi Perfil</span>
