@@ -1073,34 +1073,24 @@ def comprador_dashboard(comprador_id):
 @api.route("/comprador/carrito/items", methods=["GET"])
 @comprador_required
 def get_comprador_carrito_items(comprador_id):
-    """
-    Devuelve los ítems del carrito 'abierto' del comprador autenticado,
-    incluyendo info del producto y el total del carrito.
-    """
-    # 🔧 CORRECCIÓN: usar la columna real id_comprador (no 'comprador_id')
-    # y filtrar por status='open' si ese es tu carrito activo
     carrito = Carrito.query.filter_by(
         id_comprador=comprador_id,
-        status="open"            # ← si tu carrito activo se marca como 'open'
+        status="open"
     ).first()
 
     if not carrito:
-        # Puedes devolver 200 con items vacíos si prefieres
         return jsonify({"msg": "No tienes carrito", "items": [], "total": 0}), 404
 
-    # Carga items del carrito
     items = ItemCarrito.query.filter_by(carrito_id=carrito.id).all()
 
     result = []
     total = 0.0
 
     for item in items:
-        # Evita 500 si por alguna razón falta el producto
         producto = Producto.query.get(item.producto_id)
         if not producto:
             continue
 
-        # Asegura tipos numéricos
         precio = float(producto.precio)
         cantidad = int(item.cantidad)
         subtotal = precio * cantidad
@@ -1114,7 +1104,8 @@ def get_comprador_carrito_items(comprador_id):
                 "id": producto.id,
                 "nombre": producto.nombre,
                 "precio": precio,
-                "descripcion": producto.descripcion
+                "descripcion": producto.descripcion,
+                "imageUrl": producto.imageUrl   
             }
         })
 
