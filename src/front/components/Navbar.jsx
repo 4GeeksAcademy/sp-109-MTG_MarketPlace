@@ -37,7 +37,7 @@ export const Navbar = () => {
     };
 
     // ---- Paths ----
-    const vendedoresPath = tokenUserAdmin ? "/admin/vendedores" : "/vendedores";
+    const vendedoresPath = tokenUserAdmin ? "/useradmin/vendedores" : "/vendedores";
 
     return (
         <nav className="navbar navbar-light bg-light shadow-sm">

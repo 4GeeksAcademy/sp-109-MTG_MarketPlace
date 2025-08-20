@@ -129,12 +129,7 @@ export const ProductoLista = () => {
                   >
                     Eliminar
                   </button>
-                  <button
-                    className="btn btn-primary btn-sm"
-                    onClick={() => addToCart({ id: p.id, name: p.nombre, price: Number(p.precio) })}
-                  >
-                    Añadir al carrito
-                  </button>
+                  
                 </td>
               </tr>
             ))}

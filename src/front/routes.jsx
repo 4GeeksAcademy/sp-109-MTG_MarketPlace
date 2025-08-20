@@ -8,6 +8,7 @@ import { Demo } from "./pages/Demo";
 // Rutas privadas
 import { RutaPrivadaVendedor } from "./components/RutaPrivadaVendedor";
 import { RutaPrivadaUserAdmin } from "./components/RutaPrivadaUserAdmin";
+import { RutaPrivadaProducto } from "./components/RutaPrivadaProducto";
 
 // Vendedor
 import { VendedoresLista } from "./pages/VendedorLista";
@@ -37,8 +38,8 @@ import { ProductoDetalle } from "./pages/ProductoDetalle";
 import { CarritoLista } from "./pages/CarritoLista";
 import { CarritoForm } from "./pages/CarritoForm";
 import { CarritoDetalles } from "./pages/CarritoDetalle";
-import {Checkout} from "./pages/Checkout.jsx";
-import  Receipt  from "./pages/Receipt";
+import { Checkout } from "./pages/Checkout.jsx";
+import Receipt from "./pages/Receipt";
 
 // Ítem Carrito
 import { ItemCarritoLista } from "./pages/ItemCarritoLista";
@@ -106,9 +107,9 @@ export const router = createBrowserRouter(
       <Route path="/admin/vendedores/editar/:id" element={<UserAdminRoute><VendedorForm /></UserAdminRoute>} />*/}
 
       {/* Productos */}
-      <Route path="/productos" element={<RutaPrivadaVendedor><ProductoLista /></RutaPrivadaVendedor>} />
-      <Route path="/productos/nuevo" element={<RutaPrivadaVendedor><ProductoForm /></RutaPrivadaVendedor>} />
-      <Route path="/productos/editar/:id" element={<RutaPrivadaVendedor><ProductoForm /></RutaPrivadaVendedor>} />
+      <Route path="/productos" element={<RutaPrivadaProducto><ProductoLista /></RutaPrivadaProducto>} />
+      <Route path="/productos/nuevo" element={<RutaPrivadaProducto><ProductoForm /></RutaPrivadaProducto>} />
+      <Route path="/productos/editar/:id" element={<RutaPrivadaProducto><ProductoForm /></RutaPrivadaProducto>} />
       <Route path="/productos/detalles/:id" element={<RutaPrivadaVendedor><ProductoDetalle /></RutaPrivadaVendedor>} />
 
 

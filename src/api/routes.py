@@ -291,8 +291,18 @@ def delete_categoria(id):
 
 @api.route('/carritos', methods=['GET'])
 def get_all_carritos():
-    carritos = Carrito.query.all()
+    id_comprador = request.args.get("id_comprador", type=int)
+    status = request.args.get("status", type=str)
+
+    query = Carrito.query
+    if id_comprador:
+        query = query.filter_by(id_comprador=id_comprador)
+    if status:
+        query = query.filter_by(status=status)
+
+    carritos = query.all()
     return jsonify([c.serialize() for c in carritos]), 200
+
 
 
 @api.route('/carritos/<int:id>', methods=['GET'])
