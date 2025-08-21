@@ -106,6 +106,17 @@ export const Navbar = () => {
                             <button className="btn btn-dark btn-sm gothic-font-user">Login Admin</button>
                         </Link>
                     )}
+
+
+                    {/* ---- PERFIL ---- */}
+                     <Link
+                        to="/vendedor/perfil"
+                        className="btn btn-outline-dark d-flex align-items-center gap-2"
+                    >
+                        <i className="bi bi-person-circle" style={{ fontSize: "1.2rem" }}></i>
+                        <span>Mi Perfil</span>
+                    </Link>
+
                 </div>
             </div>
         </nav>
