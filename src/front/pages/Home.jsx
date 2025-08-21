@@ -3,6 +3,9 @@ import rigoImageUrl from "../assets/img/rigo-baby.jpg";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 
 
+import { Tienda } from "./Tienda";
+
+
 export const Home = () => {
     const { store, dispatch } = useGlobalReducer()
     const loadMessage = async () => {
@@ -23,24 +26,43 @@ export const Home = () => {
     useEffect(() => {
         loadMessage()
     }, [])
+
+
+
     return (
-        <div className="text-center mt-5">
-            <h1 className="display-4">Hello Rigo!!</h1>
-            <p className="lead">
-                <img src={rigoImageUrl} className="img-fluid rounded-circle mb-3" alt="Rigo Baby" />
-              
-            </p>  
-
-
-            <div className="alert alert-info">
-                {store.message ? (
-                    <span>{store.message}</span>
-                ) : (
-                    <span className="text-danger">
-                        Loading message from the backend (make sure your python :serpiente: backend is running)...
-                    </span>
-                )}
-            </div>
+  <>
+    <div
+      id="carouselExample"
+      className="carousel slide"
+      data-bs-ride="carousel"
+      data-bs-interval="5000"
+      style={{ width: "1920px", height: "800px", margin: "0 auto" }}
+    >
+      <div className="carousel-inner h-100">
+        <div className="carousel-item h-100">
+          <img src="https://i.imgur.com/aput3Nu.jpeg" className="d-block w-100 h-100" alt="Imagen 2" style={{ objectFit: "fill" }} />
         </div>
-    );
-};
+        <div className="carousel-item active h-100">
+          <img src="https://i.imgur.com/g0G6oFr.jpeg" className="d-block w-100 h-100" alt="Imagen 1" style={{ objectFit: "fill" }} />
+        </div>
+        <div className="carousel-item h-100">
+          <img src="https://i.imgur.com/iXYjxBI.jpeg" className="d-block w-100 h-100" alt="Imagen 3" style={{ objectFit: "cover" }} />
+        </div>
+      </div>
+
+      <button className="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+        <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span className="visually-hidden">Previous</span>
+      </button>
+
+      <button className="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+        <span className="carousel-control-next-icon" aria-hidden="true"></span>
+        <span className="visually-hidden">Next</span>
+      </button>
+    </div>
+
+    {/* Aquí fuera del carousel */}
+    <Tienda />
+  </>
+);
+}

@@ -1,11 +1,17 @@
-import { Link, useNavigate } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
+import "./Navbar.css";
 
 export const Navbar = () => {
     const navigate = useNavigate();
 
-    // ---- VENDEDOR ----
     const tokenVendedor = localStorage.getItem("tokenVendedor");
     const vendedorUsername = localStorage.getItem("vendedorUsername");
+
+    const tokenUserAdmin = localStorage.getItem("tokenUserAdmin");
+    const userAdminEmail = localStorage.getItem("userAdminEmail");
+
+    const tokenComprador = localStorage.getItem("tokenComprador");
+    const compradorUsername = localStorage.getItem("compradorUsername");
 
     const handleLogoutVendedor = () => {
         localStorage.removeItem("tokenVendedor");
@@ -14,20 +20,12 @@ export const Navbar = () => {
         navigate("/vendedor/login");
     };
 
-    // ---- ADMIN ----
-    const tokenUserAdmin = localStorage.getItem("tokenUserAdmin");
-    const userAdminEmail = localStorage.getItem("userAdminEmail");
-
     const handleLogoutUserAdmin = () => {
         localStorage.removeItem("tokenUserAdmin");
         localStorage.removeItem("userAdminEmail");
         localStorage.removeItem("userAdminId");
         navigate("/useradmin/login");
     };
-
-    // ---- COMPRADOR ----
-    const tokenComprador = localStorage.getItem("tokenComprador");
-    const compradorUsername = localStorage.getItem("compradorUsername");
 
     const handleLogoutComprador = () => {
         localStorage.removeItem("tokenComprador");
@@ -36,136 +34,79 @@ export const Navbar = () => {
         navigate("/comprador/login");
     };
 
-    // ---- Paths ----
-    const vendedoresPath = tokenUserAdmin ? "/useradmin/vendedores" : "/vendedores";
-
     return (
-        <nav className="navbar navbar-light bg-light shadow-sm">
+        <nav className="navbar navbar-light shadow-sm" style={{ backgroundColor: '#ffffff' }}>
             <div className="container d-flex justify-content-between align-items-center">
-                <Link to="/" className="navbar-brand mb-0 h1">
-                    MTG Marketplace
-                </Link>
+                {/* Logo */}
+                <NavLink to="/" className="navbar-brand mb-0 h1">
+                    <img src="https://i.imgur.com/Gij9B1M.png" alt="MTG Marketplace Logo" style={{ height: '100px' }} />
+                </NavLink>
 
-                <div className="d-flex align-items-center flex-wrap gap-2">
-                    {/* Menú principal */}
-                    <Link to="/demo">
-                        <button className="btn btn-primary">Check Context</button>
-                    </Link>
-                    <Link to={vendedoresPath}>
-                        <button className="btn btn-primary">Vendedores</button>
-                    </Link>
-                    <Link to="/compradores">
-                        <button className="btn btn-secondary">Compradores</button>
-                    </Link>
-                    <Link to="/categorias">
-                        <button className="btn btn-secondary">Categorias</button>
-                    </Link>
-                    <Link to="/productos">
-                        <button className="btn btn-secondary">Productos</button>
-                    </Link>
-                    <Link to="/tienda">
-                        <button className="btn btn-secondary">Tienda</button>
-                    </Link>
-                    <Link to="/tienda/vendedores">
-                     <button className="btn btn-secondary">Tienda Vendedores</button>
-                    </Link>
+                {/* Botón Tienda grande */}
+                <div className="mx-auto">
+                    <NavLink
+                        to="/tienda"
+                        className={({ isActive }) =>
+                            `btn gothic-font-tienda ${isActive ? "btn-secondary text-white" : "btn-link text-dark"} text-decoration-none`
+                        }
+                    >
+                        Tienda
+                    </NavLink>
+                </div>
 
-                    <Link to="/carritos">
-                        <button className="btn btn-secondary">Carritos</button>
-                    </Link>
-                    <Link to="/itemcarrito">
-                        <button className="btn btn-secondary">Ítems Carrito</button>
-                    </Link>
-                    
-                    <Link to="/producto-categoria">
-                        <button className="btn btn-secondary">Producto-Categoria</button>
-                    </Link>
-
-                    {/* ---- LOGIN COMPRADOR ---- */}
+                {/* Botones de usuario en negro con letra gótica más pequeña */}
+                <div className="d-flex align-items-center gap-2">
+                    {/* Comprador */}
                     {tokenComprador ? (
-                        <div className="d-flex align-items-center gap-2 ms-3">
-                            <span className="fw-bold text-dark">🛒 {compradorUsername}</span>
-                            <button
-                                className="btn btn-outline-danger btn-sm"
-                                onClick={handleLogoutComprador}
-                            >
-                                Cerrar sesión Comprador
-                            </button>
-                        </div>
-                    ) : (
-                        <Link to="/comprador/login" className="ms-2">
-                            <button className="btn btn-outline-success btn-sm">
-                                Iniciar sesión Comprador
-                            </button>
-                        </Link>
-                    )}
-
-                    {tokenComprador ? (
-                        <div className="d-flex align-items-center gap-2 ms-3">
-                            {/* Botón de Mi Carrito */}
+                        <div className="d-flex align-items-center gap-2">
+                            <span className="fw-bold text-dark gothic-font-user">🛒 {compradorUsername}</span>
                             <Link to="/mi-carrito">
-                            <button className="btn btn-warning btn-sm">
-                                Mi Carrito
-                            </button>
+                                <button className="btn btn-dark btn-sm gothic-font-user">Mi Carrito</button>
                             </Link>
-                        </div>
-                        ) : (
-                        <Link to="/comprador/login" className="ms-2">
-                            <button className="btn btn-outline-success btn-sm">
-                            Iniciar sesión Comprador
-                            </button>
-                        </Link>
-                    )}
-
-                    {/* ---- LOGIN VENDEDOR ---- */}
-                    {tokenVendedor ? (
-                        <div className="d-flex align-items-center gap-2 ms-3">
-                            <Link to="/vendedor/dashboard">
-                                <button className="btn btn-outline-primary btn-sm">Dashboard</button>
-                            </Link>
-                            <span className="fw-bold text-dark">👋 {vendedorUsername}</span>
-                            <button
-                                className="btn btn-outline-danger btn-sm"
-                                onClick={handleLogoutVendedor}
-                            >
-                                Cerrar sesión
+                            <button className="btn btn-dark btn-sm gothic-font-user" onClick={handleLogoutComprador}>
+                                Salir Comprador
                             </button>
                         </div>
                     ) : (
-                        <Link to="/vendedor/login" className="ms-2">
-                            <button className="btn btn-outline-success btn-sm">
-                                Iniciar sesión Vendedor
-                            </button>
+                        <Link to="/comprador/login">
+                            <button className="btn btn-dark btn-sm gothic-font-user">Login Comprador</button>
                         </Link>
                     )}
 
-                    {/* ---- LOGIN ADMIN ---- */}
+                    {/* Vendedor */}
+                    {tokenVendedor ? (
+                        <div className="d-flex align-items-center gap-2">
+                            <Link to="/vendedor/dashboard">
+                                <button className="btn btn-dark btn-sm gothic-font-user">Dashboard</button>
+                            </Link>
+                            <span className="fw-bold text-dark gothic-font-user">👋 {vendedorUsername}</span>
+                            <button className="btn btn-dark btn-sm gothic-font-user" onClick={handleLogoutVendedor}>
+                                Salir Vendedor
+                            </button>
+                        </div>
+                    ) : (
+                        <Link to="/vendedor/login">
+                            <button className="btn btn-dark btn-sm gothic-font-user">Login Vendedor</button>
+                        </Link>
+                    )}
+
+                    {/* Admin */}
                     {tokenUserAdmin ? (
-                        <div className="d-flex align-items-center gap-2 ms-3">
+                        <div className="d-flex align-items-center gap-2">
                             <Link to="/useradmin">
-                                <button className="btn btn-primary btn-sm">Administrador</button>
+                                <button className="btn btn-dark btn-sm gothic-font-user">Admin</button>
                             </Link>
-                            <Link to="/useradmin/carrito">
-                                <button className="btn btn-dark btn-sm">Carritos</button>
-                            </Link>
-                            <Link to="/useradmin/ordenes">
-                                <button className="btn btn-warning btn-sm">Ordenes</button>
-                            </Link>
-                            <span className="fw-bold text-dark">👋 {userAdminEmail}</span>
-                            <button
-                                className="btn btn-outline-danger btn-sm"
-                                onClick={handleLogoutUserAdmin}
-                            >
-                                Cerrar sesión Admin
+                            <span className="fw-bold text-dark gothic-font-user">👋 {userAdminEmail}</span>
+                            <button className="btn btn-dark btn-sm gothic-font-user" onClick={handleLogoutUserAdmin}>
+                                Salir Admin
                             </button>
                         </div>
                     ) : (
                         <Link to="/useradmin/login">
-                            <button className="btn btn-outline-success btn-sm">
-                                Iniciar sesión Admin
-                            </button>
+                            <button className="btn btn-dark btn-sm gothic-font-user">Login Admin</button>
                         </Link>
                     )}
+
 
                     {/* ---- PERFIL ---- */}
                      <Link
@@ -175,6 +116,7 @@ export const Navbar = () => {
                         <i className="bi bi-person-circle" style={{ fontSize: "1.2rem" }}></i>
                         <span>Mi Perfil</span>
                     </Link>
+
                 </div>
             </div>
         </nav>

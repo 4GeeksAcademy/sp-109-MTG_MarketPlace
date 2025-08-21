@@ -1,0 +1,19 @@
+.footer a:hover {
+    color: #ffc107; /* cambia color al pasar el cursor */
+    transform: scale(1.2);
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.gothic-font {
+    font-family: 'UnifrakturCook', cursive;
+}
+
+.gothic-font {
+  font-family: 'UnifrakturCook', cursive;
+}
+
+.footer a:hover {
+  color: #ffc107; /* color al pasar el cursor */
+  transform: scale(1.2); /* zoom leve */
+  transition: transform 0.3s ease, color 0.3s ease;
+}

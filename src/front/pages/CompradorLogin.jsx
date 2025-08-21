@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
+import { Footer } from "../components/Footer";
 
 export const CompradorLogin = () => {
   const navigate = useNavigate();
@@ -104,6 +105,6 @@ export const CompradorLogin = () => {
           ¿Olvidaste tu contraseña?
         </Link>
       </div>
-    </div>
+      </div>
   );
 };

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import "./Tiendas.css"; // Asegúrate de que la clase .gothic-font esté aquí
 
 export const TiendaDetalles = () => {
   const { id } = useParams();
@@ -30,12 +31,10 @@ export const TiendaDetalles = () => {
     }
 
     try {
-      // 1️⃣ Obtener carrito abierto
       const resCarritos = await fetch(`${API_CARRITOS}?id_comprador=${compradorId}&status=open`);
       if (!resCarritos.ok) throw new Error("No se pudo obtener el carrito");
       let [carritoActivo] = await resCarritos.json();
 
-      // 2️⃣ Si no existe carrito abierto, crearlo
       if (!carritoActivo) {
         const resNuevoCarrito = await fetch(API_CARRITOS, {
           method: "POST",
@@ -46,7 +45,6 @@ export const TiendaDetalles = () => {
         carritoActivo = await resNuevoCarrito.json();
       }
 
-      // 3️⃣ Agregar producto al carrito
       const resItem = await fetch(API_ITEM_CARRITO, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -58,7 +56,6 @@ export const TiendaDetalles = () => {
       });
 
       if (!resItem.ok) throw new Error("No se pudo agregar el producto al carrito");
-
       alert("✅ Producto agregado al carrito correctamente");
     } catch (err) {
       console.error("❌ Error al agregar al carrito:", err);
@@ -74,14 +71,15 @@ export const TiendaDetalles = () => {
         <div className="col-md-6">
           <img
             src={producto.imageUrl || "https://placehold.co/400x400?text=Sin+imagen"}
-            className="img-fluid rounded-start"
+            className="img-fluid rounded-start tienda-detalles-img"
             alt={producto.nombre}
             style={{ objectFit: "contain", maxHeight: "400px", width: "100%" }}
           />
         </div>
         <div className="col-md-6">
           <div className="card-body">
-            <h1 className="card-title">{producto.nombre}</h1>
+            {/* Nombre con letra gótica */}
+            <h1 className="card-title gothic-font">{producto.nombre}</h1>
             <hr />
             <p><strong>Descripción:</strong> {producto.descripcion || "Sin descripción."}</p>
             <ul className="list-group list-group-flush">
@@ -90,10 +88,11 @@ export const TiendaDetalles = () => {
               <li className="list-group-item"><strong>Tipo:</strong> {producto.type}</li>
             </ul>
             <div className="d-flex justify-content-between align-items-center mt-4">
-              <button className="btn btn-secondary" onClick={() => navigate("/tienda")}>
+              {/* Botones con letra gótica */}
+              <button className="btn btn-secondary gothic-font" onClick={() => navigate("/tienda")}>
                 Volver a la tienda
               </button>
-              <button className="btn btn-success" onClick={handleAgregarAlCarrito}>
+              <button className="btn btn-success gothic-font" onClick={handleAgregarAlCarrito}>
                 Agregar al carrito
               </button>
             </div>
