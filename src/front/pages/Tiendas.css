@@ -1,0 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap');
+
+.gothic-font {
+    font-family: 'UnifrakturCook', cursive;
+}
+
+
+
+.card-hover:hover {
+  background-color: #6c757d; /* Gris más oscuro */
+  color: white; /* El texto debe ser blanco para que se vea bien */
+  transition: background-color 0.3s ease-in-out;
+}
+
+.card-hover:hover .card-title,
+.card-hover:hover .card-text,
+.card-hover:hover .fw-bold {
+  color: white; /* Asegura que el texto sea legible */
+}
+
+.tienda-detalles-img {
+    transition: transform 0.3s ease; /* transición suave */
+}
+
+.tienda-detalles-img:hover {
+    transform: scale(1.05); /* leve aumento al pasar el cursor */
+}

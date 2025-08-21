@@ -1,0 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap');
+
+/* Botón Tienda grande */
+.gothic-font-tienda {
+    font-family: 'UnifrakturCook', cursive;
+    font-size: 2rem; /* más grande que los botones de usuario */
+    padding: 0.5rem 1.5rem; /* un poco más ancho y alto */
+}
+
+/* Botones de usuario con letra gótica */
+.gothic-font-user {
+    font-family: 'UnifrakturCook', cursive;
+    font-size: 1.4rem; /* más pequeño que Tienda */
+}
