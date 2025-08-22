@@ -145,7 +145,7 @@ export const Home = () => {
         className="carousel slide"
         data-bs-ride="carousel"
         data-bs-interval="3000"  
-        style={{ width: "1920px", height: "800px", margin: "0 auto" }}
+        style={{ width: "1905px", height: "800px", margin: "0 auto" }}
       >
         <div className="carousel-inner h-100">
           <div className="carousel-item h-100">

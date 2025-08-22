@@ -63,8 +63,8 @@ export const Navbar = () => {
             Tienda
           </NavLink>
 
-          {/* Productos para Vendedor y Admin */}
-          {(tokenVendedor || tokenUserAdmin) && !tokenComprador && (
+          {/* Productos solo para Vendedor */}
+          {tokenVendedor && !tokenComprador && (
             <NavLink
               to="/productos"
               className={({ isActive }) =>
@@ -103,7 +103,7 @@ export const Navbar = () => {
         <div className="d-flex align-items-center gap-2">
 
           {/* Comprador */}
-          {tokenComprador ? (
+          {tokenComprador && (
             <>
               <span className="fw-bold text-dark gothic-font-user">🛒 {compradorUsername}</span>
               <Link to="/mi-carrito">
@@ -113,13 +113,16 @@ export const Navbar = () => {
                 Salir Comprador
               </button>
             </>
-          ) : null}
+          )}
 
           {/* Vendedor */}
           {tokenVendedor && !tokenComprador && (
             <>
               <Link to="/vendedor/dashboard">
                 <button className="btn btn-dark btn-sm gothic-font-user">Dashboard</button>
+              </Link>
+              <Link to="/vendedor/perfil">
+                <button className="btn btn-dark btn-sm gothic-font-user">Mi Perfil</button>
               </Link>
               <span className="fw-bold text-dark gothic-font-user">👋 {vendedorUsername}</span>
               <button className="btn btn-dark btn-sm gothic-font-user" onClick={handleLogoutVendedor}>
