@@ -52,10 +52,10 @@ export const VendedorLogin = () => {
 
   return (
     <div className="container mt-5" style={{ maxWidth: "500px" }}>
-      <h2>Iniciar sesión como Vendedor</h2>
-      <form onSubmit={handleSubmit}>
+      <h2 className="text-center mb-4 gothic-font-user">Iniciar sesión como Vendedor</h2>
+      <form onSubmit={handleSubmit} className="p-4 shadow rounded bg-white">
         <div className="mb-3">
-          <label>Correo electrónico</label>
+          <label className="form-label gothic-font-user">Correo electrónico</label>
           <input
             type="email"
             name="correo"
@@ -67,7 +67,7 @@ export const VendedorLogin = () => {
         </div>
 
         <div className="mb-3">
-          <label>Contraseña</label>
+          <label className="form-label gothic-font-user">Contraseña</label>
           <input
             type="password"
             name="password"
@@ -80,7 +80,7 @@ export const VendedorLogin = () => {
 
         {error && <div className="alert alert-danger">{error}</div>}
 
-        <button className="btn btn-primary w-100">Iniciar Sesión</button>
+        <button className="btn btn-dark w-100 gothic-font-user">Iniciar Sesión</button>
       </form>
 
       <div className="mt-3 text-center">

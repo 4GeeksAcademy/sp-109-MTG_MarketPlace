@@ -32,27 +32,55 @@ export const VendedorRegistro = () => {
   };
 
   return (
-    <div className="container mt-4">
-      <h2>Registrarse como Vendedor</h2>
+    <div className="container mt-5" style={{ maxWidth: "500px" }}>
+      <h2 className="text-center mb-4 gothic-font-user">Registrarse como Vendedor</h2>
 
       {error && <div className="alert alert-danger">{error}</div>}
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="p-4 shadow rounded bg-white">
         <div className="mb-3">
-          <label>Nombre de usuario</label>
-          <input type="text" className="form-control" name="username" value={form.username} onChange={handleChange} required />
-        </div>
-        <div className="mb-3">
-          <label>Correo electrónico</label>
-          <input type="email" className="form-control" name="correo" value={form.correo} onChange={handleChange} required />
-        </div>
-        <div className="mb-3">
-          <label>Contraseña</label>
-          <input type="password" className="form-control" name="password" value={form.password} onChange={handleChange} required />
+          <label className="form-label gothic-font-user">Nombre de usuario</label>
+          <input
+            type="text"
+            className="form-control"
+            name="username"
+            value={form.username}
+            onChange={handleChange}
+            required
+          />
         </div>
 
-        <button className="btn btn-primary">Registrarse</button>
-        <Link to="/vendedor/login" className="btn btn-link">¿Ya tienes cuenta? Inicia sesión</Link>
+        <div className="mb-3">
+          <label className="form-label gothic-font-user">Correo electrónico</label>
+          <input
+            type="email"
+            className="form-control"
+            name="correo"
+            value={form.correo}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label gothic-font-user">Contraseña</label>
+          <input
+            type="password"
+            className="form-control"
+            name="password"
+            value={form.password}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <button className="btn btn-dark w-100 gothic-font-user">Registrarse</button>
+
+        <div className="mt-3 text-center">
+          <Link to="/vendedor/login" className="gothic-font-user">
+            ¿Ya tienes cuenta? Inicia sesión
+          </Link>
+        </div>
       </form>
     </div>
   );

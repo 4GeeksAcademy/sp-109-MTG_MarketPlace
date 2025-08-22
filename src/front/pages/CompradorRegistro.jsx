@@ -50,10 +50,14 @@ export const CompradorRegistro = () => {
 
   return (
     <div className="container mt-5" style={{ maxWidth: "500px" }}>
-      <h2>Registro de Comprador</h2>
-      <form onSubmit={handleSubmit}>
+      <h2 className="text-center mb-4 gothic-font-user">Registro de Comprador</h2>
+
+      {error && <div className="alert alert-danger">{error}</div>}
+      {exito && <div className="alert alert-success">{exito}</div>}
+
+      <form onSubmit={handleSubmit} className="p-4 shadow rounded bg-white">
         <div className="mb-3">
-          <label>Usuario</label>
+          <label className="form-label gothic-font-user">Usuario</label>
           <input
             type="text"
             name="username"
@@ -65,7 +69,7 @@ export const CompradorRegistro = () => {
         </div>
 
         <div className="mb-3">
-          <label>Correo electrónico</label>
+          <label className="form-label gothic-font-user">Correo electrónico</label>
           <input
             type="email"
             name="correo"
@@ -77,7 +81,7 @@ export const CompradorRegistro = () => {
         </div>
 
         <div className="mb-3">
-          <label>Contraseña</label>
+          <label className="form-label gothic-font-user">Contraseña</label>
           <input
             type="password"
             name="password"
@@ -88,15 +92,12 @@ export const CompradorRegistro = () => {
           />
         </div>
 
-        {error && <div className="alert alert-danger">{error}</div>}
-        {exito && <div className="alert alert-success">{exito}</div>}
+        <button className="btn btn-dark w-100 gothic-font-user">Registrarse</button>
 
-        <button className="btn btn-success w-100">Registrarse</button>
+        <div className="mt-3 text-center gothic-font-user">
+          ¿Ya tienes cuenta? <Link to="/comprador/login">Inicia sesión aquí</Link>
+        </div>
       </form>
-
-      <div className="mt-3 text-center">
-        ¿Ya tienes cuenta? <Link to="/comprador/login">Inicia sesión aquí</Link>
-      </div>
     </div>
   );
 };

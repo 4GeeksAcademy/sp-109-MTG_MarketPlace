@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
-import { Footer } from "../components/Footer";
 
 export const CompradorLogin = () => {
   const navigate = useNavigate();
@@ -61,11 +60,11 @@ export const CompradorLogin = () => {
 
   return (
     <div className="container mt-5" style={{ maxWidth: "500px" }}>
-      <h2 className="mb-4">Iniciar sesión como Comprador</h2>
+      <h2 className="mb-4 text-center gothic-font-user">Iniciar sesión como Comprador</h2>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="p-4 shadow rounded bg-white">
         <div className="mb-3">
-          <label>Correo electrónico</label>
+          <label className="form-label gothic-font-user">Correo electrónico</label>
           <input
             type="email"
             name="correo"
@@ -77,7 +76,7 @@ export const CompradorLogin = () => {
         </div>
 
         <div className="mb-3">
-          <label>Contraseña</label>
+          <label className="form-label gothic-font-user">Contraseña</label>
           <input
             type="password"
             name="password"
@@ -90,7 +89,7 @@ export const CompradorLogin = () => {
 
         {error && <div className="alert alert-danger">{error}</div>}
 
-        <button className="btn btn-primary w-100" disabled={loading}>
+        <button className="btn btn-dark w-100 gothic-font-user" disabled={loading}>
           {loading ? "Iniciando sesión..." : "Iniciar Sesión"}
         </button>
       </form>
@@ -105,6 +104,6 @@ export const CompradorLogin = () => {
           ¿Olvidaste tu contraseña?
         </Link>
       </div>
-      </div>
+    </div>
   );
 };

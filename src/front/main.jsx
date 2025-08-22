@@ -8,6 +8,8 @@ import { BackendURL } from "./components/BackendURL";
 import { CartProvider } from "./pages/CartContext";
 import { StoreProvider } from "./hooks/useGlobalReducer";
 import { CarritosProvider } from "./pages/CarritosContext";
+import "bootstrap-icons/font/bootstrap-icons.css";
+
 
 const rootElement = document.getElementById("root");
 const root = ReactDOM.createRoot(rootElement);

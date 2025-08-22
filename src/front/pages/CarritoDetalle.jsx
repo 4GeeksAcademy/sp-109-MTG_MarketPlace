@@ -43,9 +43,9 @@ export const CarritoDetalles = () => {
         <li className="list-group-item"><strong>ID:</strong> {carrito.id}</li>
         <li className="list-group-item">
           <strong>Comprador:</strong>{" "}
-          {carrito.comprador?.username
+          {carrito.comprador
             ? `${carrito.comprador.username} (ID: ${carrito.comprador.id})`
-            : `ID: ${carrito.id_comprador}`}
+            : `ID: ${carrito.id_comprador|| "No asignado"}`}
         </li>
         <li className="list-group-item"><strong>Estado:</strong> {carrito.status}</li>
       </ul>

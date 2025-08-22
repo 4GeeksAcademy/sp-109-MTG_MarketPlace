@@ -52,10 +52,12 @@ export const UserAdminLogin = () => {
 
     return (
         <div className="container mt-5" style={{ maxWidth: "500px" }}>
-            <h2>Iniciar sesión como Administrador</h2>
-            <form onSubmit={handleSubmit}>
+            {/* 🔹 Solo cambié el estilo del título */}
+            <h2 className="text-center mb-4 gothic-font-user">Iniciar sesión como Administrador</h2>
+
+            <form onSubmit={handleSubmit} className="p-4 shadow rounded bg-white">
                 <div className="mb-3">
-                    <label>Email</label>
+                    <label className="form-label gothic-font-user">Email</label>
                     <input
                         type="email"
                         name="email"
@@ -67,7 +69,7 @@ export const UserAdminLogin = () => {
                 </div>
 
                 <div className="mb-3">
-                    <label>Contraseña</label>
+                    <label className="form-label gothic-font-user">Contraseña</label>
                     <input
                         type="password"
                         name="password"
@@ -80,7 +82,8 @@ export const UserAdminLogin = () => {
 
                 {error && <div className="alert alert-danger">{error}</div>}
 
-                <button className="btn btn-primary w-100">Iniciar Sesión</button>
+                {/* 🔹 Botón negro + fuente gótica */}
+                <button className="btn btn-dark w-100 gothic-font-user">Iniciar Sesión</button>
             </form>
         </div>
     );

@@ -1,3 +1,6 @@
+
+
+
 .contenedor-mapa {
   max-width: 700px;
   margin: 0 auto;
@@ -29,3 +32,4 @@ html, body, #root {
 .main-content {
   flex: 1; /* Hace que el contenido crezca y empuje el footer abajo */
 }
+

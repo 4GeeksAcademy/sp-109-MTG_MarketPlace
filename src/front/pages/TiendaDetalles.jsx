@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import "./Tiendas.css"; // Asegúrate de que la clase .gothic-font esté aquí
+import "./Tiendas.css";
 
 export const TiendaDetalles = () => {
   const { id } = useParams();
@@ -78,7 +78,6 @@ export const TiendaDetalles = () => {
         </div>
         <div className="col-md-6">
           <div className="card-body">
-            {/* Nombre con letra gótica */}
             <h1 className="card-title gothic-font">{producto.nombre}</h1>
             <hr />
             <p><strong>Descripción:</strong> {producto.descripcion || "Sin descripción."}</p>
@@ -90,7 +89,10 @@ export const TiendaDetalles = () => {
             <div className="d-flex justify-content-between align-items-center mt-4">
               {/* Botones con letra gótica */}
               <button className="btn btn-secondary gothic-font" onClick={() => navigate("/tienda")}>
-                Volver a la tienda
+                Ir a Tienda
+              </button>
+              <button className="btn btn-dark gothic-font" onClick={() => navigate("/")}>
+                Ir a Home
               </button>
               <button className="btn btn-success gothic-font" onClick={handleAgregarAlCarrito}>
                 Agregar al carrito
